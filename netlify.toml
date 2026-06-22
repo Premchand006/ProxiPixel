@@ -1,0 +1,7 @@
+# Netlify deploy config (Vercel needs no config file). The official Next.js
+# plugin handles the App Router, middleware, and server actions.
+[build]
+  command = "pnpm build"
+
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
