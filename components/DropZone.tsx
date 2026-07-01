@@ -84,7 +84,7 @@ export function DropZone() {
         type="file"
         id="fileInput"
         multiple
-        accept="image/*,video/*,.heic,.heif,.tif,.tiff,.pdf,application/pdf"
+        accept="image/*,video/*,.jpg,.jpeg,.png,.webp,.avif,.gif,.bmp,.heic,.heif,.tif,.tiff,.pdf,application/pdf"
         className="hide"
         onChange={(e) => {
           if (e.target.files) addFiles(e.target.files);

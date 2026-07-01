@@ -27,6 +27,7 @@
     "@supabase/supabase-js": "2.108.2",
     "docx": "9.7.1",
     "drizzle-orm": "0.38.3",
+    "heic-to": "1.5.2",
     "jszip": "3.10.1",
     "mammoth": "1.12.0",
     "marked": "18.0.5",
@@ -53,6 +54,7 @@
     "jsdom": "25.0.1",
     "postcss": "8.4.49",
     "prettier": "3.8.4",
+    "sharp": "0.35.2",
     "tailwindcss": "3.4.17",
     "typescript": "6.0.3",
     "vitest": "2.1.9"

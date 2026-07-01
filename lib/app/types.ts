@@ -123,7 +123,7 @@ export const DEFAULT_OPTIONS: Options = {
 
 /** Input format chips shown on the dropzone. */
 export const INPUTS = [
-  "JPEG",
+  "JPG",
   "PNG",
   "WEBP",
   "AVIF",

@@ -78,7 +78,7 @@ function StudioLayout() {
       )}
       <Notes />
       <footer>
-        ProxiPixel · local-first · images: PNG · JPEG · WebP · AVIF · BMP · GIF ·
+        ProxiPixel · local-first · images: PNG · JPG · WebP · AVIF · BMP · GIF ·
         TIFF · PDF ↔ image · HEIC in · video: MP4 · WebM · GIF (FFmpeg.wasm) ·
         docs: DOCX · ODT · RTF · MD · HTML · TXT · XLSX · CSV
       </footer>

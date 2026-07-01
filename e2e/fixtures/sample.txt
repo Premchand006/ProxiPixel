@@ -1,0 +1,3 @@
+ProxiPixel fixture
+Line two with some words.
+Line three.

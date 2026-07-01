@@ -1,15 +1,3 @@
-import type { OptimizeFormat } from "./types";
-import { canvasBlob, flatten, type Canvas } from "./canvas";
-
-/** MIME type for an Optimize-tool output format. */
-export function optMime(fmt: OptimizeFormat): string {
-  return fmt === "jpeg"
-    ? "image/jpeg"
-    : fmt === "avif"
-      ? "image/avif"
-      : "image/webp";
-}
-
 export interface Sized {
   size: number;
 }
@@ -41,18 +29,4 @@ export async function optimizeToTargetSize<T extends Sized>(
     best = { result: await encode(q), q };
   }
   return best;
-}
-
-/** Browser convenience: target-size search over canvas encoding. */
-export async function optimizeCanvasToTargetSize(
-  canvas: Canvas,
-  type: string,
-  targetBytes: number,
-): Promise<{ blob: Blob; q: number }> {
-  const { result, q } = await optimizeToTargetSize<Blob>(
-    (qq) =>
-      canvasBlob(type === "image/jpeg" ? flatten(canvas) : canvas, type, qq),
-    targetBytes,
-  );
-  return { blob: result, q };
 }

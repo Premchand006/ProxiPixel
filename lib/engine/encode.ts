@@ -26,7 +26,7 @@ export const EXT: Record<ImageFormat, string> = {
 /** Output formats offered by the Convert tool, as `[value, label]`. */
 export const OUT_CONVERT: ReadonlyArray<readonly [ImageFormat, string]> = [
   ["png", "PNG"],
-  ["jpeg", "JPEG"],
+  ["jpeg", "JPG"],
   ["webp", "WEBP"],
   ["avif", "AVIF"],
   ["bmp", "BMP"],

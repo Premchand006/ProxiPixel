@@ -1,45 +1,49 @@
-# dependencies
+# ---- Dependencies ----
 /node_modules
 .pnpm-store
+.pnpm-debug.log*
 
-# next.js
+# ---- Next.js / build output ----
 /.next/
 /out/
+/build
 next-env.d.ts
 
-# production
-/build
+# ---- TypeScript ----
+*.tsbuildinfo
 
-# testing
+# ---- Testing ----
 /coverage
 /test-results
 /playwright-report
+/blob-report
+/playwright/.cache
 /.playwright
 
-# drizzle
+# ---- Drizzle (generated migration metadata) ----
 /drizzle
 
-# env
+# ---- Environment / secrets ----
 .env
-.env.local
 .env*.local
+*.pem
 
-# local reference source (already vendored into lib/engine/watermark)
-/watermark-remover/
-
-# scratch / local-only tooling (never committed)
-/work-desk.png
-/Gemini_Generated_Image_*.png
+# ---- Scratch & local-only tooling (never committed) ----
 /tmp/
 /scripts/
+/work-desk.png
+/Gemini_Generated_Image_*.png
 
-# misc
-.DS_Store
-*.pem
+# ---- Logs ----
+*.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+# ---- Editor / OS ----
 .vscode/*
 !.vscode/extensions.json
 .idea
-*.tsbuildinfo
+*.swp
+.DS_Store
+Thumbs.db

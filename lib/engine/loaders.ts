@@ -10,14 +10,17 @@
 export const CDN = {
   gifenc: "https://cdn.jsdelivr.net/npm/gifenc@1.0.3/dist/gifenc.esm.js",
   utif: "https://cdn.jsdelivr.net/npm/utif@3.1.0/UTIF.js",
-  heic2any: "https://cdn.jsdelivr.net/npm/heic2any@0.0.4/dist/heic2any.min.js",
-  jspdf: "https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.2/jspdf.umd.min.js",
+  jspdf: "https://cdn.jsdelivr.net/npm/jspdf@2.5.2/dist/jspdf.umd.min.js",
   jszip: "https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js",
   pdfjs: "https://cdn.jsdelivr.net/npm/pdfjs-dist@4.0.379/build/pdf.mjs",
   pdfjsWorker:
     "https://cdn.jsdelivr.net/npm/pdfjs-dist@4.0.379/build/pdf.worker.mjs",
   ffmpegBase: "https://unpkg.com/@ffmpeg/ffmpeg@0.12.10/dist/umd",
-  ffcoreBase: "https://unpkg.com/@ffmpeg/core@0.12.6/dist/umd",
+  // ESM core: @ffmpeg/ffmpeg creates the worker as a module worker whenever a
+  // classWorkerURL is supplied, and a module worker has no `importScripts` — it
+  // falls back to `import(coreURL)`, which only works on the ESM core build.
+  // (The UMD core throws "failed to import ffmpeg-core.js" there.)
+  ffcoreBase: "https://unpkg.com/@ffmpeg/core@0.12.6/dist/esm",
 } as const;
 
 /**

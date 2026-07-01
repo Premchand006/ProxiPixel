@@ -21,9 +21,6 @@ export type ImageFormat =
   | "tiff"
   | "pdf";
 
-/** Formats the Optimize tool can target (all lossy). */
-export type OptimizeFormat = "avif" | "webp" | "jpeg";
-
 export type ResampleMethod = "lanczos" | "smooth";
 
 /** Options for the Upscale/clarity pipeline. Amounts are normalized 0..1-ish. */

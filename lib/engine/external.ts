@@ -55,11 +55,6 @@ export interface JsPDFConstructor {
   }): JsPDFInstance;
 }
 
-export type Heic2Any = (opts: {
-  blob: Blob;
-  toType: string;
-}) => Promise<Blob | Blob[]>;
-
 export interface PdfjsViewport {
   width: number;
   height: number;
@@ -100,7 +95,6 @@ export interface FFmpegConstructor {
 declare global {
   interface Window {
     UTIF?: UtifModule;
-    heic2any?: Heic2Any;
     jspdf?: { jsPDF: JsPDFConstructor };
     FFmpegWASM?: { FFmpeg: FFmpegConstructor };
   }

@@ -18,13 +18,6 @@ export async function pngSize(canvas: HTMLCanvasElement): Promise<number> {
   }
 }
 
-/** Whether a file looks like a still image we can decode (incl. heic/tiff). */
-export function isImageLike(file: File): boolean {
-  return (
-    file.type.startsWith("image/") || /\.(heic|heif|tif|tiff)$/i.test(file.name)
-  );
-}
-
 export function isPdf(file: File): boolean {
   return /\.pdf$/i.test(file.name) || file.type === "application/pdf";
 }

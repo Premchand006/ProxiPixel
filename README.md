@@ -12,7 +12,7 @@ Convert, upscale, optimize, de-watermark, transcode video, and convert documents
 [![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind-3-38BDF8?logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
 [![Supabase](https://img.shields.io/badge/Supabase-Auth%20%C2%B7%20DB%20%C2%B7%20Storage-3FCF8E?logo=supabase&logoColor=white)](https://supabase.com/)
-[![Tests](https://img.shields.io/badge/tests-56%20unit%20%2B%20e2e-success)](#testing)
+[![Tests](https://img.shields.io/badge/tests-57%20unit%20%2B%2033%20e2e-success)](#testing)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](./LICENSE)
 
 [**Features**](#features) · [**Architecture**](#architecture) · [**How it works**](#how-it-works) · [**Quick start**](#quick-start)
@@ -41,10 +41,10 @@ ProxiPixel is organized as six focused tools, each in its own tab:
 
 | Tool | What it does | Formats |
 | :--- | :--- | :--- |
-| 🔄 **Convert** | Re-encode images between formats, including PDF ⇄ image | PNG · JPEG · WebP · AVIF · BMP · GIF · TIFF · PDF · HEIC (in) |
+| 🔄 **Convert** | Re-encode images between formats, including PDF ⇄ image | PNG · JPG · WebP · AVIF · BMP · GIF · TIFF · PDF · HEIC (in) |
 | 🔍 **Upscale** | Enlarge to **4K UHD** with gamma-correct Lanczos + Gaussian sharpening | Any image → up to 3840px long edge |
-| 🪶 **Optimize** | Compress to a **target quality** or a **target file size** (binary-searched) | AVIF · WebP · JPEG (+ width cap) |
-| ✦ **Watermark** | Remove Gemini's visible watermark via exact **reverse alpha blending** | Gemini-generated PNG/JPEG/WebP |
+| 🪶 **Optimize** | Compress to a **target quality** or a **target file size** (binary-searched) | AVIF · WebP · JPG (+ width cap) |
+| ✦ **Watermark** | Remove Gemini's visible watermark via exact **reverse alpha blending** | Gemini-generated PNG/JPG/WebP |
 | 🎬 **Video** | Transcode, trim, crop, change fps, mute — via **FFmpeg.wasm** | MP4 (H.264) · WebM (VP9) · GIF |
 | 📄 **Documents** | Convert documents & spreadsheets **both ways** | DOCX · ODT · RTF · MD · HTML · TXT · XLSX · CSV · ODS · PPTX (in) |
 
@@ -113,12 +113,12 @@ flowchart LR
     A["Drop · click · paste"] --> B{File type?}
     B -->|image| C["Decode → Canvas"]
     B -->|PDF| D["pdf.js → page canvases"]
-    B -->|HEIC / TIFF| E["heic2any · UTIF"]
+    B -->|HEIC / TIFF| E["heic-to · UTIF"]
     C --> F
     D --> F
     E --> F["RawImage<br/>(RGBA, DOM-free)"]
     F --> G["Engine<br/>convert · upscale · optimize · watermark"]
-    G --> H["Encode<br/>PNG · JPEG · WebP · AVIF · BMP · GIF · TIFF · PDF"]
+    G --> H["Encode<br/>PNG · JPG · WebP · AVIF · BMP · GIF · TIFF · PDF"]
     H --> I["Download · ZIP · Save to library"]
 ```
 
@@ -211,8 +211,7 @@ proxipixel/
 ├── server/                   # Server Actions: jobs, presets, outputs, shares, validation
 ├── db/                       # Drizzle schema, SQL migrations, RLS + storage policies
 ├── tests/                    # Vitest unit tests (engine · server · docs)
-├── e2e/                      # Playwright end-to-end tests
-└── reference/                # Original single-file design reference (archive)
+└── e2e/                      # Playwright end-to-end tests + sample fixtures
 ```
 
 ---
@@ -271,16 +270,25 @@ pnpm dev          # → http://localhost:3000
 ## Testing
 
 ```bash
-pnpm test         # Vitest — 56 unit tests (engine · server · docs)
-pnpm test:e2e     # Playwright — real-browser flows incl. document round-trips
+pnpm test         # Vitest — 57 unit tests (engine · server · docs)
+pnpm test:e2e     # Playwright — real-browser conversion matrix across every tool
 pnpm verify       # typecheck + lint + test + build (the full gate)
 ```
 
 - **Unit tests** assert engine correctness against the reference (BMP header bytes, Lanczos
   size/constancy, gamma round-trip, EXIF GPS detection, FFmpeg arg strings, and every
   document conversion both ways).
-- **E2E tests** drive a real Chromium browser through the Documents tab to verify the binary
-  readers (DOCX via mammoth, ODT via the custom parser) that can't run in jsdom.
+- **E2E tests** drive a real Chromium browser over genuine sample files (in `e2e/fixtures/`,
+  reproducible via `generate.mjs`) and assert real output bytes/MIME for:
+  - the full **Convert** matrix — every image input → every output format;
+  - **Upscale**, **Optimize** and **Watermark** across their option branches;
+  - every **Documents** cross-conversion (doc⇄doc, sheet⇄sheet, cross-family);
+  - the **Video** pipeline (FFmpeg.wasm) end-to-end.
+
+  > AVIF *encoding* and heavy VP9/WebM *encoding* can't be exercised reliably in headless
+  > Chromium (no AVIF encoder; the ~32 MB FFmpeg core reloads per page), so those output
+  > paths are covered by the unit-tested encoders/argument builders instead. They work in
+  > real Chrome/Edge.
 
 ---
 
@@ -335,7 +343,8 @@ typecheck, lint, tests, and build.
   both **MIT licensed**. The reverse-alpha method and calibrated masks are © their authors.
 - Built with [Next.js](https://nextjs.org/), [Supabase](https://supabase.com/),
   [FFmpeg.wasm](https://ffmpegwasm.netlify.app/), [SheetJS](https://sheetjs.com/),
-  [mammoth.js](https://github.com/mwilliamson/mammoth.js), and [docx](https://docx.js.org/).
+  [mammoth.js](https://github.com/mwilliamson/mammoth.js), [docx](https://docx.js.org/), and
+  [heic-to](https://github.com/hoppergee/heic-to) (HEIF/HEIC decoding).
 
 ---
 
