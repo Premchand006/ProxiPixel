@@ -15,6 +15,7 @@ export function OptionsPanel() {
       id="tool-panel"
       role="tabpanel"
       aria-labelledby={`tab-${mode}`}
+      aria-describedby={`tab-${mode}-desc`}
     >
       {mode === "convert" && <ConvertPanel />}
       {mode === "upscale" && <UpscalePanel />}

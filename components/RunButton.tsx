@@ -10,6 +10,7 @@ const LABELS: Record<Mode, string> = {
   watermark: "Remove watermarks",
   video: "Process video",
   documents: "Convert documents",
+  pdftools: "Run",
 };
 
 export function RunButton() {

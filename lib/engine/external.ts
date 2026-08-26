@@ -1,8 +1,7 @@
 /**
- * Minimal type surfaces for the CDN-loaded libraries the browser adapters use.
- * These are loaded at runtime (ESM dynamic import or UMD script injection),
- * faithful to the reference, so no npm dependency is added. Only the members
- * ProxiPixel actually calls are typed.
+ * Minimal type surfaces for libraries loaded lazily at runtime (dynamic
+ * `import()` for npm packages without bundled types, or UMD script injection
+ * for FFmpeg.wasm). Only the members ProxiPixel actually calls are typed.
  */
 
 export interface UtifIFD {
@@ -94,8 +93,6 @@ export interface FFmpegConstructor {
 
 declare global {
   interface Window {
-    UTIF?: UtifModule;
-    jspdf?: { jsPDF: JsPDFConstructor };
     FFmpegWASM?: { FFmpeg: FFmpegConstructor };
   }
 }

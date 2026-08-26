@@ -37,7 +37,7 @@ export async function prepareSavedOutput(
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) return { ok: false, error: "Not signed in" };
-  if (!allow(`save:${user.id}`, 40))
+  if (!(await allow(`save:${user.id}`, 40)))
     return { ok: false, error: "Too many requests — slow down." };
 
   const parsed = prepareSchema.safeParse(raw);

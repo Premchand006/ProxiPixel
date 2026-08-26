@@ -20,7 +20,7 @@ export async function createShare(
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) return { ok: false, error: "Not signed in" };
-  if (!allow(`share:${user.id}`, 20))
+  if (!(await allow(`share:${user.id}`, 20)))
     return { ok: false, error: "Too many requests — slow down." };
 
   const parsed = uuidSchema.safeParse(jobId);

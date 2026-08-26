@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { createRateState, rateLimit, sweep } from "@/server/rate-limit";
+import { allow, createRateState, rateLimit, sweep } from "@/server/rate-limit";
 
 describe("rateLimit", () => {
   it("allows up to the limit within a window, then blocks", () => {
@@ -33,5 +33,18 @@ describe("rateLimit", () => {
     sweep(s, 2000);
     expect(s.buckets.has("a")).toBe(false);
     expect(s.buckets.has("b")).toBe(true);
+  });
+});
+
+describe("allow", () => {
+  // No UPSTASH_REDIS_REST_URL/TOKEN in the test env, so this exercises the
+  // in-memory fallback path — same one a local dev or single-instance deploy
+  // without Upstash configured actually runs.
+  it("enforces the limit and blocks over it, keyed independently", async () => {
+    const key = `test:${Math.random()}`;
+    expect(await allow(key, 2)).toBe(true);
+    expect(await allow(key, 2)).toBe(true);
+    expect(await allow(key, 2)).toBe(false);
+    expect(await allow(`other:${key}`, 2)).toBe(true);
   });
 });

@@ -7,14 +7,17 @@ import { OptionsPanel } from "./OptionsPanel";
 import { PresetBar } from "./PresetBar";
 import { Queue } from "./Queue";
 import { DocumentStudio } from "./DocumentStudio";
+import { PdfToolsStudio } from "./PdfToolsStudio";
 import { CompareModal } from "./CompareModal";
 import { VideoModal } from "./VideoModal";
+import Image from "next/image";
 
 function Header() {
   return (
     <header className="top">
       <div className="brand">
         <div className="wordmark">
+          <Image src="/logo.png" alt="" width={36} height={36} className="wordmarklogo" priority />
           PIXEL<b>FORGE</b>
         </div>
         <div className="tagline">
@@ -47,9 +50,10 @@ function Notes() {
         FFmpeg.wasm (~31 MB, fetched on first use). Must be served over http(s).
       </div>
       <div className="note">
-        <b>Documents.</b> Convert DOCX · ODT · RTF · MD · HTML · TXT and XLSX ·
-        CSV · ODS both ways (PPTX import). 100% in your browser — nothing is
-        uploaded.
+        <b>Documents.</b> Convert DOCX · ODT · RTF · PDF · MD · HTML · TXT and
+        XLSX · CSV · ODS both ways (PPTX import). PDF is text-only — no
+        layout, images, or fonts survive the round trip. 100% in your browser
+        — nothing is uploaded.
       </div>
       <div className="note">
         <b>Metadata stripped.</b> Every image export is decoded and re-encoded
@@ -68,6 +72,8 @@ function StudioLayout() {
       <Tabs />
       {mode === "documents" ? (
         <DocumentStudio />
+      ) : mode === "pdftools" ? (
+        <PdfToolsStudio />
       ) : (
         <>
           <DropZone />
@@ -80,7 +86,7 @@ function StudioLayout() {
       <footer>
         ProxiPixel · local-first · images: PNG · JPG · WebP · AVIF · BMP · GIF ·
         TIFF · PDF ↔ image · HEIC in · video: MP4 · WebM · GIF (FFmpeg.wasm) ·
-        docs: DOCX · ODT · RTF · MD · HTML · TXT · XLSX · CSV
+        docs: DOCX · ODT · RTF · PDF · MD · HTML · TXT · XLSX · CSV · ODS
       </footer>
       <CompareModal />
       <VideoModal />

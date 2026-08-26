@@ -24,7 +24,7 @@ export async function recordJob(
   } = await supabase.auth.getUser();
   if (!user) return { recorded: false };
   // Generous: a batch run records one row per item.
-  if (!allow(`job:${user.id}`, 120)) return { recorded: false };
+  if (!(await allow(`job:${user.id}`, 120))) return { recorded: false };
 
   const parsed = jobInputSchema.safeParse(raw);
   if (!parsed.success) return { recorded: false };

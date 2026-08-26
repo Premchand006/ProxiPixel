@@ -1,5 +1,4 @@
 import { newCanvas, ctx2d, flatten, type Canvas } from "./canvas";
-import { CDN, injectScript, loadModule } from "./loaders";
 import type { JsPDFConstructor, PdfjsModule } from "./external";
 
 let pdfjs: PdfjsModule | null = null;
@@ -7,8 +6,13 @@ let pdfjs: PdfjsModule | null = null;
 async function loadPdfjs(): Promise<PdfjsModule> {
   if (pdfjs) return pdfjs;
   try {
-    const lib = await loadModule<PdfjsModule>(CDN.pdfjs);
-    lib.GlobalWorkerOptions.workerSrc = CDN.pdfjsWorker;
+    const lib = (await import("pdfjs-dist")) as unknown as PdfjsModule;
+    // Bundler-emitted, same-origin worker URL (see pdfjs-dist's bundler docs) —
+    // webpack resolves this at build time and copies the file to static output.
+    lib.GlobalWorkerOptions.workerSrc = new URL(
+      "pdfjs-dist/build/pdf.worker.mjs",
+      import.meta.url,
+    ).toString();
     pdfjs = lib;
   } catch {
     throw new Error("PDF support didn’t load");
@@ -39,9 +43,8 @@ export async function renderPdfPages(file: File): Promise<PdfPage[]> {
 }
 
 async function loadJsPDF(): Promise<JsPDFConstructor> {
-  if (!window.jspdf) await injectScript(CDN.jspdf);
-  if (!window.jspdf) throw new Error("PDF support didn’t load");
-  return window.jspdf.jsPDF;
+  const { jsPDF } = await import("jspdf");
+  return jsPDF as unknown as JsPDFConstructor;
 }
 
 /** Wrap a single image as a one-page PDF sized to fit. Ported verbatim. */

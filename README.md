@@ -46,7 +46,7 @@ ProxiPixel is organized as six focused tools, each in its own tab:
 | 🪶 **Optimize** | Compress to a **target quality** or a **target file size** (binary-searched) | AVIF · WebP · JPG (+ width cap) |
 | ✦ **Watermark** | Remove Gemini's visible watermark via exact **reverse alpha blending** | Gemini-generated PNG/JPG/WebP |
 | 🎬 **Video** | Transcode, trim, crop, change fps, mute — via **FFmpeg.wasm** | MP4 (H.264) · WebM (VP9) · GIF |
-| 📄 **Documents** | Convert documents & spreadsheets **both ways** | DOCX · ODT · RTF · MD · HTML · TXT · XLSX · CSV · ODS · PPTX (in) |
+| 📄 **Documents** | Convert documents & spreadsheets **both ways** | DOCX · ODT · RTF · PDF · MD · HTML · TXT · XLSX · CSV · ODS · PPTX (in) |
 
 **Across all tools:**
 
@@ -153,7 +153,7 @@ or `HTML table → CSV`.
 flowchart LR
     subgraph DOCS["📄 Documents"]
         direction LR
-        TXT["TXT"]; MD["MD"]; HTML["HTML"]; RTF["RTF"]; DOCX["DOCX"]; ODT["ODT"]; PPTX["PPTX (in)"]
+        TXT["TXT"]; MD["MD"]; HTML["HTML"]; RTF["RTF"]; DOCX["DOCX"]; ODT["ODT"]; PDF["PDF"]; PPTX["PPTX (in)"]
     end
     subgraph SHEETS["📊 Spreadsheets"]
         direction LR
@@ -309,6 +309,7 @@ pnpm verify       # typecheck + lint + test + build (the full gate)
 ## Privacy & security
 
 - **Media never leaves the browser** for processing — no third-party services, no telemetry on your files.
+- **No third-party code at runtime, either.** Every media library (FFmpeg.wasm, pdf.js, gifenc, UTIF, jsPDF) is a pinned npm dependency, vendored same-origin at build time — nothing is fetched from a CDN into your browser on page load, so there's no third-party origin that could serve different code than what was audited and built.
 - The database stores **metadata only** (`kind`, source name/format/size, options, output size, timestamp) — never raw media.
 - **Saving an output** is an explicit, single-file opt-in to your private Storage bucket.
 - **Row Level Security** (`db/policies.sql`) ensures users can only read/write their own rows.

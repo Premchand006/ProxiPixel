@@ -1,7 +1,21 @@
 # Netlify deploy config (Vercel needs no config file). The official Next.js
 # plugin handles the App Router, middleware, and server actions.
+#
+# The plugin bundles middleware.ts as a Netlify Edge Function (Deno, not
+# Node.js) — different from Vercel's own edge runtime. Everything here is
+# written to that constraint: no Node built-ins in middleware.ts or
+# sentry.edge.config.ts, and the edge Sentry init is wrapped so a runtime
+# incompatibility degrades to "no edge error tracking" rather than a broken
+# middleware (see the comment in sentry.edge.config.ts).
 [build]
   command = "pnpm build"
+
+[build.environment]
+  # Pinned rather than left to Netlify's default — matches engines.node in
+  # package.json and the Node version this app is actually tested on (CI,
+  # local dev). pnpm itself is pinned via the packageManager field, which
+  # Netlify's corepack respects automatically.
+  NODE_VERSION = "20"
 
 [[plugins]]
   package = "@netlify/plugin-nextjs"

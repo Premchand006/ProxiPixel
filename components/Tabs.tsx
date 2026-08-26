@@ -2,15 +2,16 @@
 
 import { useRef } from "react";
 import { useStudio } from "@/lib/app/store";
-import type { Mode } from "@/lib/app/types";
+import { TAB_DESCRIPTIONS, type Mode } from "@/lib/app/types";
 
 const TABS: Array<{ mode: Mode; label: string }> = [
-  { mode: "convert", label: "Convert" },
+  { mode: "convert", label: "Pixel" },
   { mode: "upscale", label: "Upscale" },
   { mode: "optimize", label: "Optimize" },
   { mode: "watermark", label: "Watermark" },
   { mode: "video", label: "Video" },
   { mode: "documents", label: "Documents" },
+  { mode: "pdftools", label: "PDF Tools" },
 ];
 
 export function Tabs() {
@@ -31,30 +32,36 @@ export function Tabs() {
   }
 
   return (
-    <div className="tabs" role="tablist" aria-label="Tool">
-      {TABS.map((t, i) => {
-        const selected = mode === t.mode;
-        return (
-          <button
-            key={t.mode}
-            type="button"
-            ref={(el) => {
-              refs.current[i] = el;
-            }}
-            className="tab"
-            role="tab"
-            id={`tab-${t.mode}`}
-            aria-selected={selected}
-            aria-controls="tool-panel"
-            tabIndex={selected ? 0 : -1}
-            data-mode={t.mode}
-            onClick={() => setMode(t.mode)}
-            onKeyDown={(e) => onKeyDown(e, i)}
-          >
-            {t.label}
-          </button>
-        );
-      })}
-    </div>
+    <>
+      <div className="tabs" role="tablist" aria-label="Tool">
+        {TABS.map((t, i) => {
+          const selected = mode === t.mode;
+          return (
+            <button
+              key={t.mode}
+              type="button"
+              ref={(el) => {
+                refs.current[i] = el;
+              }}
+              className="tab"
+              role="tab"
+              id={`tab-${t.mode}`}
+              aria-selected={selected}
+              aria-controls="tool-panel"
+              tabIndex={selected ? 0 : -1}
+              data-mode={t.mode}
+              title={TAB_DESCRIPTIONS[t.mode]}
+              onClick={() => setMode(t.mode)}
+              onKeyDown={(e) => onKeyDown(e, i)}
+            >
+              {t.label}
+            </button>
+          );
+        })}
+      </div>
+      <p className="tabdesc" id={`tab-${mode}-desc`}>
+        {TAB_DESCRIPTIONS[mode]}
+      </p>
+    </>
   );
 }

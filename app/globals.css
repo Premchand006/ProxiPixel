@@ -68,6 +68,9 @@ header.top {
   gap: 6px;
 }
 .wordmark {
+  display: flex;
+  align-items: center;
+  gap: 10px;
   font-family: var(--display);
   font-weight: 700;
   letter-spacing: -0.02em;
@@ -76,6 +79,10 @@ header.top {
   text-shadow:
     -1.6px 0 var(--magenta),
     1.6px 0 var(--cyan);
+}
+.wordmarklogo {
+  border-radius: 8px;
+  flex-shrink: 0;
 }
 .wordmark b {
   color: var(--text);
@@ -142,6 +149,11 @@ header.top {
 .tab:focus-visible {
   outline: 2px solid var(--cyan);
   outline-offset: 2px;
+}
+.tabdesc {
+  color: var(--muted);
+  font-size: 13px;
+  margin: -10px 0 18px;
 }
 
 /* ---------- dropzone (hero) ---------- */
@@ -313,6 +325,35 @@ input[type="range"] {
   color: var(--faint);
   flex-basis: 100%;
   margin-top: -6px;
+}
+.pdftoolgrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 8px;
+  margin-bottom: 10px;
+}
+.pdftoolcard {
+  appearance: none;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface-2);
+  color: var(--muted);
+  font-family: var(--body);
+  font-weight: 600;
+  font-size: 13px;
+  text-align: left;
+  padding: 12px 14px;
+  cursor: pointer;
+  transition: 0.15s;
+}
+.pdftoolcard:hover {
+  color: var(--text);
+  border-color: var(--line-soft);
+}
+.pdftoolcard[aria-pressed="true"] {
+  color: var(--ink);
+  background: linear-gradient(120deg, var(--cyan), var(--magenta));
+  border-color: transparent;
 }
 .spacer {
   flex: 1 1 auto;
@@ -874,12 +915,19 @@ footer {
   border-bottom: 1px solid var(--line-soft);
 }
 .navbrand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   font-family: var(--display);
   font-weight: 700;
   font-size: 15px;
   letter-spacing: 0.04em;
   color: var(--text);
   text-decoration: none;
+}
+.navlogo {
+  border-radius: 6px;
+  flex-shrink: 0;
 }
 .navspacer {
   flex: 1 1 auto;

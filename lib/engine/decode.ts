@@ -1,5 +1,4 @@
 import { newCanvas, ctx2d, type Canvas } from "./canvas";
-import { CDN, injectScript } from "./loaders";
 import type { UtifModule } from "./external";
 
 /**
@@ -34,9 +33,10 @@ export function blobToCanvas(blob: Blob): Promise<Canvas> {
 }
 
 async function loadUTIF(): Promise<UtifModule> {
-  if (!window.UTIF) await injectScript(CDN.utif);
-  if (!window.UTIF) throw new Error("TIFF support didn’t load");
-  return window.UTIF;
+  const mod = (await import("utif")) as unknown as {
+    default?: UtifModule;
+  } & UtifModule;
+  return mod.default ?? mod;
 }
 
 /**

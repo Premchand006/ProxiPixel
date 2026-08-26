@@ -12,6 +12,7 @@ export type DocFormat =
   | "rtf"
   | "docx"
   | "odt"
+  | "pdf"
   | "pptx"
   | "ppt"
   | "csv"
@@ -37,6 +38,16 @@ export const FORMATS: Record<DocFormat, FormatInfo> = {
   odt: {
     ext: "odt",
     label: "OpenDocument Text (ODT)",
+    family: "doc",
+    canRead: true,
+    canWrite: true,
+    bestEffort: true,
+  },
+  // Best-effort like odt: text/structure only, extracted from (or laid out
+  // into) pages via pdfjs-dist / jsPDF — no layout, images, or font fidelity.
+  pdf: {
+    ext: "pdf",
+    label: "PDF",
     family: "doc",
     canRead: true,
     canWrite: true,
@@ -73,6 +84,7 @@ const BY_EXT: Record<string, DocFormat> = {
   rtf: "rtf",
   docx: "docx",
   odt: "odt",
+  pdf: "pdf",
   pptx: "pptx",
   ppt: "ppt",
   csv: "csv",

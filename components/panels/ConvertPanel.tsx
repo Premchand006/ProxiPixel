@@ -12,6 +12,14 @@ const WARN: Partial<Record<ImageFormat, string>> = {
   bmp: "BMP is uncompressed 24-bit.",
 };
 
+// Pixel re-encodes images to pixel formats, plus PDF as a one-page wrap
+// around the image (lib/engine/pdf.ts) — grouped separately since it isn't
+// a pixel format. Document round-tripping — DOCX/MD/HTML/XLSX, PDF included
+// — lives in the Documents tab.
+const DOCUMENT_FORMATS: ReadonlySet<ImageFormat> = new Set(["pdf"]);
+const IMAGE_GROUP = OUT_CONVERT.filter(([v]) => !DOCUMENT_FORMATS.has(v));
+const DOCUMENT_GROUP = OUT_CONVERT.filter(([v]) => DOCUMENT_FORMATS.has(v));
+
 export function ConvertPanel() {
   const { options, setConvert, avifOK } = useStudio();
   const { fmt, q } = options.convert;
@@ -32,11 +40,20 @@ export function ConvertPanel() {
           value={fmt}
           onChange={(e) => setConvert({ fmt: e.target.value as ImageFormat })}
         >
-          {OUT_CONVERT.map(([v, l]) => (
-            <option key={v} value={v}>
-              {l}
-            </option>
-          ))}
+          <optgroup label="Image formats">
+            {IMAGE_GROUP.map(([v, l]) => (
+              <option key={v} value={v}>
+                {l}
+              </option>
+            ))}
+          </optgroup>
+          <optgroup label="Document">
+            {DOCUMENT_GROUP.map(([v, l]) => (
+              <option key={v} value={v}>
+                {l}
+              </option>
+            ))}
+          </optgroup>
         </select>
       </div>
       {lossy && (

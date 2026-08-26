@@ -27,7 +27,7 @@ export async function savePreset(
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) return { ok: false, error: "Not signed in" };
-  if (!allow(`preset-write:${user.id}`, 30)) return { ok: false, error: TOO_MANY };
+  if (!(await allow(`preset-write:${user.id}`, 30))) return { ok: false, error: TOO_MANY };
 
   const parsed = presetInputSchema.safeParse(raw);
   if (!parsed.success) return { ok: false, error: "Invalid preset" };
@@ -56,7 +56,7 @@ export async function deletePreset(id: string): Promise<ActionResult> {
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) return { ok: false, error: "Not signed in" };
-  if (!allow(`preset-write:${user.id}`, 30)) return { ok: false, error: TOO_MANY };
+  if (!(await allow(`preset-write:${user.id}`, 30))) return { ok: false, error: TOO_MANY };
 
   const parsed = uuidSchema.safeParse(id);
   if (!parsed.success) return { ok: false, error: "Invalid id" };

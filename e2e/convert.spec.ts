@@ -9,7 +9,7 @@ const RED_PNG_2x2 = Buffer.from(
 test("home page renders the wordmark and tools", async ({ page }) => {
   await page.goto("/");
   await expect(page.locator(".wordmark")).toContainText("PIXEL");
-  await expect(page.getByRole("tab", { name: "Convert" })).toHaveAttribute(
+  await expect(page.getByRole("tab", { name: "Pixel" })).toHaveAttribute(
     "aria-selected",
     "true",
   );
