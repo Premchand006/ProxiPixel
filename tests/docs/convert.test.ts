@@ -113,6 +113,27 @@ describe("spreadsheet conversions", () => {
   });
 });
 
+describe("PDF conversions", () => {
+  // Writer only (jsPDF, no worker involved) — Node-testable. The reader
+  // (pdfjs-dist text extraction) needs a real Worker; pdfjs's fake-worker
+  // fallback resolves its module URL against `import.meta.url`, which
+  // Vitest's Vite-based runner rewrites to an http: URL that Node's ESM
+  // loader can't dynamic-import — a test-environment artifact, not a bug (the
+  // same `new URL(..., import.meta.url)` pattern already works in the real
+  // browser bundle for lib/engine/pdf.ts's PDF→image path). Covered by the
+  // "pdf" source in e2e/documents-matrix.spec.ts instead.
+  it("md → pdf produces a valid PDF file", async () => {
+    const { bytes, blob } = await convert(
+      "# Heading\n\nA paragraph of body text.",
+      "a.md",
+      "pdf",
+    );
+    expect(String.fromCharCode(...bytes.slice(0, 5))).toBe("%PDF-");
+    expect(blob.type).toBe("application/pdf");
+    expect(bytes.length).toBeGreaterThan(200);
+  });
+});
+
 describe("office document writers", () => {
   it("md → docx produces a valid (zip) Word file", async () => {
     const { bytes, blob } = await convert("# Heading\n\nA paragraph.", "a.md", "docx");

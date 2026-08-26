@@ -1,35 +1,22 @@
 /**
- * Runtime loaders for the optional, CDN-hosted libraries. Faithful to the
- * reference single-file app: heavy encoders/decoders are fetched on first use
- * rather than bundled, so the core PNG/JPEG/WebP/BMP path never depends on
- * them. Versions are pinned to the ones the reference was tested against.
+ * Runtime loaders for the browser-only media engine.
  *
- * Phase 7 may revisit this (e.g. self-host or npm-bundle) for offline/strict
- * CSP deploys; URLs are centralized here to make that a one-file change.
+ * gifenc, utif, jspdf, and pdfjs-dist are real npm dependencies now (see
+ * package.json) — call sites `import()` them directly and code-split
+ * naturally, so the core PNG/JPEG/WebP/BMP path still never pulls them in.
+ *
+ * FFmpeg.wasm is the one exception: its loader (`ffmpeg.js`) and core
+ * (`ffmpeg-core.js` + `.wasm`) are fetched by URL at runtime — that's how
+ * `@ffmpeg/ffmpeg` itself works, not something ProxiPixel chose — so they
+ * can't just be `import()`ed. `VENDOR` points those fetches at same-origin
+ * copies under `public/vendor/`, produced from the pinned package versions by
+ * `tools/vendor-assets.mjs` on `postinstall`. Nothing in the engine fetches
+ * code from a third-party origin at runtime any more.
  */
-export const CDN = {
-  gifenc: "https://cdn.jsdelivr.net/npm/gifenc@1.0.3/dist/gifenc.esm.js",
-  utif: "https://cdn.jsdelivr.net/npm/utif@3.1.0/UTIF.js",
-  jspdf: "https://cdn.jsdelivr.net/npm/jspdf@2.5.2/dist/jspdf.umd.min.js",
-  jszip: "https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js",
-  pdfjs: "https://cdn.jsdelivr.net/npm/pdfjs-dist@4.0.379/build/pdf.mjs",
-  pdfjsWorker:
-    "https://cdn.jsdelivr.net/npm/pdfjs-dist@4.0.379/build/pdf.worker.mjs",
-  ffmpegBase: "https://unpkg.com/@ffmpeg/ffmpeg@0.12.10/dist/umd",
-  // ESM core: @ffmpeg/ffmpeg creates the worker as a module worker whenever a
-  // classWorkerURL is supplied, and a module worker has no `importScripts` — it
-  // falls back to `import(coreURL)`, which only works on the ESM core build.
-  // (The UMD core throws "failed to import ffmpeg-core.js" there.)
-  ffcoreBase: "https://unpkg.com/@ffmpeg/core@0.12.6/dist/esm",
+export const VENDOR = {
+  ffmpegBase: "/vendor/ffmpeg",
+  ffcoreBase: "/vendor/ffmpeg-core",
 } as const;
-
-/**
- * Dynamic-import an ESM module from a URL. The `webpackIgnore` magic comment
- * keeps the bundler from trying to resolve the CDN specifier at build time.
- */
-export async function loadModule<T>(url: string): Promise<T> {
-  return (await import(/* webpackIgnore: true */ url)) as T;
-}
 
 /** Inject a UMD `<script>` and resolve once it has loaded (browser only). */
 export function injectScript(src: string): Promise<void> {

@@ -1,4 +1,4 @@
-import { CDN, fetchFile, injectScript, toBlobURL } from "../loaders";
+import { VENDOR, fetchFile, injectScript, toBlobURL } from "../loaders";
 import type { FFmpegInstance } from "../external";
 import type { VideoOptions } from "../types";
 import { buildVideoArgs } from "./args";
@@ -27,7 +27,7 @@ export async function loadFFmpeg(): Promise<FFmpegInstance> {
   if (ffmpegLoading) return ffmpegLoading;
   ffmpegLoading = (async () => {
     if (typeof window.FFmpegWASM === "undefined") {
-      await injectScript(`${CDN.ffmpegBase}/ffmpeg.js`);
+      await injectScript(`${VENDOR.ffmpegBase}/ffmpeg.js`);
     }
     if (!window.FFmpegWASM) throw new Error("FFmpeg failed to load");
     const inst = new window.FFmpegWASM.FFmpeg();
@@ -39,15 +39,15 @@ export async function loadFFmpeg(): Promise<FFmpegInstance> {
     });
     await inst.load({
       classWorkerURL: await toBlobURL(
-        `${CDN.ffmpegBase}/814.ffmpeg.js`,
+        `${VENDOR.ffmpegBase}/814.ffmpeg.js`,
         "text/javascript",
       ),
       coreURL: await toBlobURL(
-        `${CDN.ffcoreBase}/ffmpeg-core.js`,
+        `${VENDOR.ffcoreBase}/ffmpeg-core.js`,
         "text/javascript",
       ),
       wasmURL: await toBlobURL(
-        `${CDN.ffcoreBase}/ffmpeg-core.wasm`,
+        `${VENDOR.ffcoreBase}/ffmpeg-core.wasm`,
         "application/wasm",
       ),
     });

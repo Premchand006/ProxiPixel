@@ -8,7 +8,6 @@ import {
   DOC_EXT_RE,
   FORMATS,
   detectFormat,
-  targetsFor,
   type DocFormat,
 } from "@/lib/docs/formats";
 
@@ -16,22 +15,22 @@ interface DocItem {
   id: number;
   file: File;
   src: DocFormat | null; // null => unsupported / legacy
-  target: DocFormat;
   size: number;
   status: string;
   statusKind: "" | "work" | "err";
   result?: { url: string; name: string; size: number };
 }
 
-/** A sensible default target for a freshly-added source. */
-function defaultTarget(src: DocFormat): DocFormat {
-  const targets = targetsFor(src);
-  const prefer = FORMATS[src].family === "sheet" ? "csv" : "md";
-  return targets.includes(prefer) ? prefer : (targets[0] ?? src);
-}
+// Every writable format is a valid target for every readable source — the
+// doc/sheet families bridge through HTML tables (see lib/docs/formats.ts) —
+// so one global target works uniformly, same as the Pixel tab's "Convert to".
+const WRITABLE_FORMATS = (Object.keys(FORMATS) as DocFormat[]).filter(
+  (f) => FORMATS[f].canWrite,
+);
 
 export function DocumentStudio() {
   const [items, setItems] = useState<DocItem[]>([]);
+  const [target, setTarget] = useState<DocFormat>("md");
   const [busy, setBusy] = useState(false);
   const [over, setOver] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -63,7 +62,6 @@ export function DocumentStudio() {
           id: idRef.current++,
           file,
           src,
-          target: src && readable ? defaultTarget(src) : ("md" as DocFormat),
           size: file.size,
           status: readable
             ? ""
@@ -78,10 +76,10 @@ export function DocumentStudio() {
 
   const runOne = useCallback(
     async (it: DocItem): Promise<void> => {
-      if (!it.src || !FORMATS[it.src].canRead) return;
+      if (!it.src || !FORMATS[it.src].canRead || it.src === target) return;
       update(it.id, { status: "converting…", statusKind: "work" });
       try {
-        const { blob, name } = await convertDocument(it.file, it.src, it.target);
+        const { blob, name } = await convertDocument(it.file, it.src, target);
         update(it.id, {
           status: "",
           statusKind: "",
@@ -94,16 +92,18 @@ export function DocumentStudio() {
         });
       }
     },
-    [update],
+    [update, target],
   );
 
   const runAll = useCallback(async () => {
-    const ready = items.filter((it) => it.src && FORMATS[it.src].canRead && !it.result);
+    const ready = items.filter(
+      (it) => it.src && FORMATS[it.src].canRead && it.src !== target && !it.result,
+    );
     if (!ready.length) return;
     setBusy(true);
     for (const it of ready) await runOne(it);
     setBusy(false);
-  }, [items, runOne]);
+  }, [items, target, runOne]);
 
   const removeItem = useCallback((id: number) => {
     setItems((prev) => {
@@ -120,7 +120,19 @@ export function DocumentStudio() {
     });
   }, []);
 
-  const convertible = items.filter((it) => it.src && FORMATS[it.src].canRead);
+  // Clear stale results when the target changes, so a downloaded link never
+  // silently disagrees with the currently-selected format.
+  const setTargetFormat = useCallback((next: DocFormat) => {
+    setTarget(next);
+    setItems((prev) => {
+      for (const it of prev) if (it.result) URL.revokeObjectURL(it.result.url);
+      return prev.map((it) => ({ ...it, result: undefined }));
+    });
+  }, []);
+
+  const convertible = items.filter(
+    (it) => it.src && FORMATS[it.src].canRead && it.src !== target,
+  );
 
   return (
     <>
@@ -165,7 +177,7 @@ export function DocumentStudio() {
           conversion runs locally, nothing is uploaded
         </p>
         <div className="formats">
-          {["DOCX", "ODT", "RTF", "HTML", "MD", "TXT", "PPTX", "XLSX", "CSV", "ODS"].map(
+          {["DOCX", "ODT", "RTF", "PDF", "HTML", "MD", "TXT", "PPTX", "XLSX", "CSV", "ODS"].map(
             (f) => (
               <span className="fmt" key={f}>
                 {f}
@@ -187,24 +199,44 @@ export function DocumentStudio() {
         />
       </div>
 
-      <div className="bar">
-        <h3>
-          <span>{items.length}</span> file{items.length === 1 ? "" : "s"} loaded
-        </h3>
-        <div className="barbtns">
-          <button
-            type="button"
-            className="ghost accent"
-            disabled={busy || !convertible.length}
-            onClick={() => void runAll()}
+      <div className="panel">
+        <div className="field">
+          <label htmlFor="docFmt">Convert to</label>
+          <select
+            id="docFmt"
+            value={target}
+            onChange={(e) => setTargetFormat(e.target.value as DocFormat)}
           >
-            {busy ? "Converting…" : "Convert all"}
-          </button>
-          <button type="button" className="ghost" disabled={!items.length} onClick={clearAll}>
-            Clear
-          </button>
+            {WRITABLE_FORMATS.map((f) => (
+              <option key={f} value={f}>
+                {FORMATS[f].label}
+                {FORMATS[f].bestEffort ? " (best-effort)" : ""}
+              </option>
+            ))}
+          </select>
         </div>
+        <div className="spacer" />
+        <button
+          className="run"
+          disabled={busy || !convertible.length}
+          onClick={() => void runAll()}
+        >
+          {busy ? "Working…" : "Convert all"}
+        </button>
       </div>
+
+      {items.length > 0 && (
+        <div className="bar">
+          <h3>
+            <span>{items.length}</span> file{items.length === 1 ? "" : "s"} loaded
+          </h3>
+          <div className="barbtns">
+            <button type="button" className="ghost" onClick={clearAll}>
+              Clear
+            </button>
+          </div>
+        </div>
+      )}
 
       {items.length === 0 ? (
         <div className="empty">No files yet — add some above to get started.</div>
@@ -228,46 +260,16 @@ export function DocumentStudio() {
                   )}
                 </div>
                 {it.status && <div className={`status ${it.statusKind}`}>{it.status}</div>}
+                {!it.status && it.src === target && (
+                  <div className="status">Already {FORMATS[target].label}</div>
+                )}
               </div>
 
               <div className="docctl">
-                {it.src && FORMATS[it.src].canRead && (
-                  <>
-                    <span className="arrow">→</span>
-                    <select
-                      aria-label="Convert to"
-                      value={it.target}
-                      onChange={(e) =>
-                        update(it.id, {
-                          target: e.target.value as DocFormat,
-                          result: undefined,
-                          status: "",
-                          statusKind: "",
-                        })
-                      }
-                    >
-                      {targetsFor(it.src).map((t) => (
-                        <option key={t} value={t}>
-                          {FORMATS[t].label}
-                          {FORMATS[t].bestEffort ? " (best-effort)" : ""}
-                        </option>
-                      ))}
-                    </select>
-                    {it.result ? (
-                      <a className="dl" href={it.result.url} download={it.result.name}>
-                        Download
-                      </a>
-                    ) : (
-                      <button
-                        type="button"
-                        className="cmpbtn"
-                        disabled={it.statusKind === "work"}
-                        onClick={() => void runOne(it)}
-                      >
-                        Convert
-                      </button>
-                    )}
-                  </>
+                {it.result && (
+                  <a className="dl" href={it.result.url} download={it.result.name}>
+                    Download
+                  </a>
                 )}
                 <button
                   type="button"

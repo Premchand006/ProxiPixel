@@ -8,6 +8,7 @@
   },
   "packageManager": "pnpm@10.29.3",
   "scripts": {
+    "postinstall": "node tools/vendor-assets.mjs",
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
@@ -23,40 +24,63 @@
     "verify": "pnpm typecheck && pnpm lint && pnpm test && pnpm build"
   },
   "dependencies": {
+    "@ffmpeg/core": "0.12.6",
+    "@ffmpeg/ffmpeg": "0.12.10",
+    "@sentry/nextjs": "10.71.0",
     "@supabase/ssr": "0.12.0",
     "@supabase/supabase-js": "2.108.2",
+    "@upstash/ratelimit": "2.0.8",
+    "@upstash/redis": "1.38.2",
     "docx": "9.7.1",
-    "drizzle-orm": "0.38.3",
+    "drizzle-orm": "0.45.2",
+    "gifenc": "1.0.3",
     "heic-to": "1.5.2",
+    "jspdf": "4.2.1",
     "jszip": "3.10.1",
     "mammoth": "1.12.0",
     "marked": "18.0.5",
-    "next": "^15.5.19",
+    "next": "^15.5.23",
+    "pdf-lib": "1.17.1",
+    "pdfjs-dist": "4.2.67",
     "postgres": "^3.4.9",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
     "turndown": "7.2.4",
+    "utif": "3.1.0",
     "xlsx": "https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz",
     "zod": "^3.25.76"
   },
+  "pnpm": {
+    "overrides": {
+      "tar": "^7.5.21",
+      "brace-expansion": "^1.1.18",
+      "js-yaml": "^4.3.1",
+      "nanoid@<4": "^3.3.18",
+      "nanoid@>=4": "^5.1.16",
+      "postcss": "^8.5.26",
+      "sharp": "^0.35.2"
+    }
+  },
   "devDependencies": {
-    "@playwright/test": "1.49.1",
+    "@lhci/cli": "0.15.1",
+    "@netlify/plugin-nextjs": "5.15.13",
+    "@playwright/test": "1.62.1",
     "@types/node": "25.9.3",
     "@types/react": "19.2.17",
     "@types/react-dom": "19.2.3",
     "@types/turndown": "5.0.6",
     "@vitejs/plugin-react": "4.3.4",
     "autoprefixer": "10.4.20",
-    "drizzle-kit": "0.30.1",
+    "drizzle-kit": "0.31.10",
     "eslint": "8.57.1",
-    "eslint-config-next": "15.5.19",
+    "eslint-config-next": "15.5.23",
     "eslint-config-prettier": "10.1.8",
     "jsdom": "25.0.1",
-    "postcss": "8.4.49",
+    "postcss": "8.5.26",
     "prettier": "3.8.4",
     "sharp": "0.35.2",
     "tailwindcss": "3.4.17",
     "typescript": "6.0.3",
-    "vitest": "2.1.9"
+    "vitest": "3.2.7"
   }
 }

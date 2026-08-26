@@ -7,7 +7,6 @@ import {
   ctx2d,
   type Canvas,
 } from "./canvas";
-import { CDN, injectScript, loadModule } from "./loaders";
 import type { GifencModule, UtifModule } from "./external";
 import { encodePDF } from "./pdf";
 
@@ -95,11 +94,11 @@ export function encodeBMP(img: RawImage): Uint8Array<ArrayBuffer> {
   return new Uint8Array(buf);
 }
 
-/** GIF (256-color, quantized) via the CDN `gifenc` ESM module. */
+/** GIF (256-color, quantized) via the `gifenc` module (code-split on first use). */
 export async function encodeGIF(canvas: Canvas): Promise<Blob> {
-  const { GIFEncoder, quantize, applyPalette } = await loadModule<GifencModule>(
-    CDN.gifenc,
-  );
+  const { GIFEncoder, quantize, applyPalette } = (await import(
+    "gifenc"
+  )) as unknown as GifencModule;
   const { data, width, height } = getImageDataOf(canvas);
   const palette = quantize(data, 256);
   const index = applyPalette(data, palette);
@@ -110,12 +109,13 @@ export async function encodeGIF(canvas: Canvas): Promise<Blob> {
 }
 
 async function loadUTIF(): Promise<UtifModule> {
-  if (!window.UTIF) await injectScript(CDN.utif);
-  if (!window.UTIF) throw new Error("TIFF support didn’t load");
-  return window.UTIF;
+  const mod = (await import("utif")) as unknown as {
+    default?: UtifModule;
+  } & UtifModule;
+  return mod.default ?? mod;
 }
 
-/** Uncompressed TIFF via the CDN `UTIF` UMD global. */
+/** Uncompressed TIFF via the `UTIF` module (code-split on first use). */
 export async function encodeTIFF(canvas: Canvas): Promise<Blob> {
   const UTIF = await loadUTIF();
   const id = getImageDataOf(canvas);

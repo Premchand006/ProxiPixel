@@ -11,7 +11,8 @@ export type Mode =
   | "optimize"
   | "watermark"
   | "video"
-  | "documents";
+  | "documents"
+  | "pdftools";
 
 export type StatusKind = "" | "work" | "err";
 
@@ -141,6 +142,20 @@ export const TAB_TITLES: Record<Mode, string> = {
   watermark: "Drop Gemini images to remove watermarks",
   video: "Drop videos to convert & enhance",
   documents: "Drop documents & spreadsheets to convert",
+  pdftools: "Drop PDFs to edit",
+};
+
+/** One-line statement of what each tab is for, shown under the tab bar and as
+ *  each tab button's tooltip — so the six tools read as distinct, not as an
+ *  undifferentiated row of labels. */
+export const TAB_DESCRIPTIONS: Record<Mode, string> = {
+  convert: "Change an image's file format — no compression or resizing applied.",
+  upscale: "Enlarge an image (up to 4K) with sharpening — for making images bigger.",
+  optimize: "Shrink file size to a target quality or target KB — for making images smaller.",
+  watermark: "Remove the visible Gemini watermark from an AI-generated image.",
+  video: "Transcode, trim, crop, or mute a video clip.",
+  documents: "Convert documents and spreadsheets — Word, Markdown, HTML, Excel, CSV, and more.",
+  pdftools: "Merge, split, reorder, rotate, crop, and add page numbers to a PDF.",
 };
 
 export const VIDEO_EXT =

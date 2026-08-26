@@ -26,14 +26,14 @@ test("tabs switch the tool panel", async ({ page }) => {
 
 test("tablist is keyboard navigable with arrow keys", async ({ page }) => {
   await page.goto("/");
-  await page.getByRole("tab", { name: "Convert" }).focus();
+  await page.getByRole("tab", { name: "Pixel" }).focus();
   await page.keyboard.press("ArrowRight");
   await expect(page.getByRole("tab", { name: "Upscale" })).toHaveAttribute(
     "aria-selected",
     "true",
   );
   await page.keyboard.press("ArrowLeft");
-  await expect(page.getByRole("tab", { name: "Convert" })).toHaveAttribute(
+  await expect(page.getByRole("tab", { name: "Pixel" })).toHaveAttribute(
     "aria-selected",
     "true",
   );

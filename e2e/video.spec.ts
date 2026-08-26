@@ -4,8 +4,9 @@ import { gotoApp, selectTab, addImage, runAndCollect, reportAndAssert, EXT } fro
 /**
  * FFmpeg.wasm smoke test: transcode an H.264 MP4 to an animated GIF end-to-end
  * through the app UI — decode → palettegen/paletteuse → GIF encode → a
- * downloadable blob. This exercises the full video pipeline and the CDN FFmpeg
- * load (the ESM core fixed in lib/engine/loaders.ts).
+ * downloadable blob. This exercises the full video pipeline and the vendored
+ * FFmpeg load (same-origin assets under public/vendor/, see
+ * lib/engine/loaders.ts and tools/vendor-assets.mjs).
  *
  * Scope note: the app supports mp4/webm/mov inputs → mp4/webm/gif outputs, all
  * through this same pipeline. The remaining combinations are impractical to run

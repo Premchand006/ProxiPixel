@@ -27,6 +27,11 @@ export const metadata: Metadata = {
   title: "ProxiPixel — image converter, upscaler & optimizer",
   description:
     "Privacy-first, browser-based media tools: convert, upscale, optimize, and edit images and video — all in your browser. Files never leave your device.",
+  icons: {
+    icon: "/logo.png",
+    shortcut: "/logo.png",
+    apple: "/logo.png",
+  },
 };
 
 export default function RootLayout({

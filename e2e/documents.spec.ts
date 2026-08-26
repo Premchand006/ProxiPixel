@@ -17,12 +17,12 @@ interface Upload {
   buffer: Buffer;
 }
 
-/** Upload one file, pick a target, convert, and return the downloaded bytes. */
+/** Upload one file, pick the global target, convert, and return the downloaded bytes. */
 async function convertOnce(page: Page, file: Upload, target: string): Promise<Buffer> {
   await page.locator('input[type="file"]').setInputFiles(file);
+  await page.selectOption("#docFmt", target);
+  await page.getByRole("button", { name: "Convert all", exact: true }).click();
   const row = page.locator(".docrow").last();
-  await row.locator("select").selectOption(target);
-  await row.getByRole("button", { name: "Convert", exact: true }).click();
   const link = row.getByRole("link", { name: "Download" });
   await expect(link).toBeVisible({ timeout: 30_000 });
   const [download] = await Promise.all([page.waitForEvent("download"), link.click()]);

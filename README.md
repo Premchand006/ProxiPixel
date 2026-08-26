@@ -4,7 +4,7 @@
 
 ### A privacy-first media studio that runs **entirely in your browser**
 
-Convert, upscale, optimize, de-watermark, transcode video, and convert documents —
+Convert, upscale, optimize, de-watermark, transcode video, convert documents, and edit PDFs —
 **your files never leave your device.** No queues, no uploads, no limits.
 
 [![Next.js](https://img.shields.io/badge/Next.js-15-000000?logo=next.js&logoColor=white)](https://nextjs.org/)
@@ -12,7 +12,7 @@ Convert, upscale, optimize, de-watermark, transcode video, and convert documents
 [![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind-3-38BDF8?logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
 [![Supabase](https://img.shields.io/badge/Supabase-Auth%20%C2%B7%20DB%20%C2%B7%20Storage-3FCF8E?logo=supabase&logoColor=white)](https://supabase.com/)
-[![Tests](https://img.shields.io/badge/tests-57%20unit%20%2B%2033%20e2e-success)](#testing)
+[![Tests](https://img.shields.io/badge/tests-80%20unit%20%2B%2038%20e2e-success)](#testing)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](./LICENSE)
 
 [**Features**](#features) · [**Architecture**](#architecture) · [**How it works**](#how-it-works) · [**Quick start**](#quick-start)
@@ -25,8 +25,8 @@ Convert, upscale, optimize, de-watermark, transcode video, and convert documents
 
 **ProxiPixel** is a local-first media toolkit built with **Next.js 15** and **TypeScript**.
 Every transform — image conversion, AI-watermark removal, 4K upscaling, video transcoding,
-and document/spreadsheet conversion — runs **client-side** using the Canvas API, WebAssembly
-(FFmpeg.wasm), and pure TypeScript engines. The backend (Supabase) is intentionally thin: it
+document/spreadsheet conversion, and PDF editing — runs **client-side** using the Canvas API,
+WebAssembly (FFmpeg.wasm), and pure TypeScript engines. The backend (Supabase) is intentionally thin: it
 stores only **metadata** (job history, presets) and, *opt-in*, a single saved output — **never
 your raw media**.
 
@@ -37,7 +37,7 @@ your raw media**.
 
 ## Features
 
-ProxiPixel is organized as six focused tools, each in its own tab:
+ProxiPixel is organized as seven focused tools, each in its own tab:
 
 | Tool | What it does | Formats |
 | :--- | :--- | :--- |
@@ -46,7 +46,8 @@ ProxiPixel is organized as six focused tools, each in its own tab:
 | 🪶 **Optimize** | Compress to a **target quality** or a **target file size** (binary-searched) | AVIF · WebP · JPG (+ width cap) |
 | ✦ **Watermark** | Remove Gemini's visible watermark via exact **reverse alpha blending** | Gemini-generated PNG/JPG/WebP |
 | 🎬 **Video** | Transcode, trim, crop, change fps, mute — via **FFmpeg.wasm** | MP4 (H.264) · WebM (VP9) · GIF |
-| 📄 **Documents** | Convert documents & spreadsheets **both ways** | DOCX · ODT · RTF · MD · HTML · TXT · XLSX · CSV · ODS · PPTX (in) |
+| 📄 **Documents** | Convert documents & spreadsheets **both ways** | DOCX · ODT · RTF · PDF · MD · HTML · TXT · XLSX · CSV · ODS · PPTX (in) |
+| 🧩 **PDF Tools** | Merge, split, remove/extract/reorder pages, rotate, crop margins, and stamp page numbers | PDF in → PDF out |
 
 **Across all tools:**
 
@@ -153,7 +154,7 @@ or `HTML table → CSV`.
 flowchart LR
     subgraph DOCS["📄 Documents"]
         direction LR
-        TXT["TXT"]; MD["MD"]; HTML["HTML"]; RTF["RTF"]; DOCX["DOCX"]; ODT["ODT"]; PPTX["PPTX (in)"]
+        TXT["TXT"]; MD["MD"]; HTML["HTML"]; RTF["RTF"]; DOCX["DOCX"]; ODT["ODT"]; PDF["PDF"]; PPTX["PPTX (in)"]
     end
     subgraph SHEETS["📊 Spreadsheets"]
         direction LR
@@ -181,6 +182,7 @@ Powered by `mammoth` (DOCX read), `docx` (DOCX write), `SheetJS` (spreadsheets),
 | **Image engine** | Canvas API · pure-TS Lanczos / unsharp / BMP / optimize · vendored Gemini watermark engine |
 | **Video** | FFmpeg.wasm (loaded on demand) |
 | **Documents** | SheetJS · mammoth · docx · marked · turndown · jszip |
+| **PDF Tools** | pdf-lib (loaded on demand) |
 | **Backend** | Supabase (Postgres · Auth · Storage) · Drizzle ORM · Zod |
 | **Tooling** | pnpm · ESLint · Prettier · Vitest · Playwright |
 
@@ -197,10 +199,12 @@ proxipixel/
 ├── components/               # React UI
 │   ├── Studio.tsx Tabs.tsx DropZone.tsx Queue.tsx ...
 │   ├── panels/               #   Convert · Upscale · Optimize · Watermark · Video
-│   └── DocumentStudio.tsx    #   self-contained Documents tool
+│   ├── DocumentStudio.tsx    #   self-contained Documents tool
+│   └── PdfToolsStudio.tsx    #   self-contained PDF Tools tool
 ├── lib/
 │   ├── engine/               # Framework-agnostic media engine (pure, unit-tested)
 │   │   ├── upscale.ts encode.ts decode.ts optimize.ts raster.ts exif.ts pdf.ts
+│   │   ├── pdftools.ts       #   merge · split · reorder · rotate · crop · page numbers (pdf-lib)
 │   │   ├── video/            #   FFmpeg arg builder + runner
 │   │   └── watermark/        #   typed wrapper + vendored reverse-alpha engine
 │   ├── docs/                 # Document & spreadsheet conversion engine
@@ -270,8 +274,8 @@ pnpm dev          # → http://localhost:3000
 ## Testing
 
 ```bash
-pnpm test         # Vitest — 57 unit tests (engine · server · docs)
-pnpm test:e2e     # Playwright — real-browser conversion matrix across every tool
+pnpm test         # Vitest — 80 unit tests (engine · server · docs)
+pnpm test:e2e     # Playwright — 38 tests, real-browser conversion matrix across every tool
 pnpm verify       # typecheck + lint + test + build (the full gate)
 ```
 
@@ -283,7 +287,8 @@ pnpm verify       # typecheck + lint + test + build (the full gate)
   - the full **Convert** matrix — every image input → every output format;
   - **Upscale**, **Optimize** and **Watermark** across their option branches;
   - every **Documents** cross-conversion (doc⇄doc, sheet⇄sheet, cross-family);
-  - the **Video** pipeline (FFmpeg.wasm) end-to-end.
+  - the **Video** pipeline (FFmpeg.wasm) end-to-end;
+  - **PDF Tools** — merge, rotate, remove pages, and invalid-range error handling.
 
   > AVIF *encoding* and heavy VP9/WebM *encoding* can't be exercised reliably in headless
   > Chromium (no AVIF encoder; the ~32 MB FFmpeg core reloads per page), so those output
@@ -309,6 +314,7 @@ pnpm verify       # typecheck + lint + test + build (the full gate)
 ## Privacy & security
 
 - **Media never leaves the browser** for processing — no third-party services, no telemetry on your files.
+- **No third-party code at runtime, either.** Every media library (FFmpeg.wasm, pdf.js, gifenc, UTIF, jsPDF) is a pinned npm dependency, vendored same-origin at build time — nothing is fetched from a CDN into your browser on page load, so there's no third-party origin that could serve different code than what was audited and built.
 - The database stores **metadata only** (`kind`, source name/format/size, options, output size, timestamp) — never raw media.
 - **Saving an output** is an explicit, single-file opt-in to your private Storage bucket.
 - **Row Level Security** (`db/policies.sql`) ensures users can only read/write their own rows.
@@ -324,6 +330,7 @@ ProxiPixel is honest about what a browser can and can't do:
 - **Upscale** is a high-quality *classical* pipeline (gamma-correct Lanczos + sharpening). It enlarges existing detail crisply but doesn't *invent* new detail like a trained super-resolution model.
 - **Watermark** removal targets Gemini's *visible* bottom-right logo only — not invisible SynthID markers, and not other watermarks.
 - **Documents**: `.pptx` is import-only and legacy binary `.ppt` is unsupported (true Office fidelity needs server-side LibreOffice, which would break the no-upload guarantee).
+- **PDF Tools** operates on page structure only (merge, split, reorder, rotate, crop margins, page numbers) — it doesn't re-flow or edit PDF content/text.
 
 ---
 

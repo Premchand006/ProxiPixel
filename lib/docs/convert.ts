@@ -38,6 +38,7 @@ const MIME: Partial<Record<DocFormat, string>> = {
   rtf: "application/rtf",
   docx: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
   odt: "application/vnd.oasis.opendocument.text",
+  pdf: "application/pdf",
   pptx: "application/vnd.openxmlformats-officedocument.presentationml.presentation",
   csv: "text/csv;charset=utf-8",
   xlsx: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
@@ -229,6 +230,62 @@ async function blocksToOdt(blocks: Block[]): Promise<Blob> {
   return zip.generateAsync({ type: "blob", mimeType: MIME.odt });
 }
 
+// Heading sizes (pt) for blocksToPdf — h1 largest, matches the visual weight
+// blocksToDocx gets for free from Word's built-in heading styles.
+const PDF_HEADING_SIZE: Partial<Record<Block["type"], number>> = {
+  h1: 24,
+  h2: 20,
+  h3: 17,
+  h4: 15,
+  h5: 13,
+  h6: 12,
+};
+
+async function blocksToPdf(blocks: Block[]): Promise<Blob> {
+  const { jsPDF } = await import("jspdf");
+  const doc = new jsPDF({ unit: "pt", format: "a4" });
+  const margin = 48;
+  const pageHeight = doc.internal.pageSize.getHeight();
+  const maxWidth = doc.internal.pageSize.getWidth() - margin * 2;
+  let y = margin;
+
+  const ensureRoom = (needed: number): void => {
+    if (y + needed > pageHeight - margin) {
+      doc.addPage();
+      y = margin;
+    }
+  };
+
+  for (const b of blocks) {
+    if (b.type === "table") {
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(10);
+      for (const row of b.rows ?? []) {
+        const lines: string[] = doc.splitTextToSize(row.join("   |   "), maxWidth);
+        ensureRoom(lines.length * 12);
+        doc.text(lines, margin, y + 9);
+        y += lines.length * 12;
+      }
+      y += 10;
+      continue;
+    }
+
+    const heading = /^h[1-6]$/.test(b.type);
+    const size = PDF_HEADING_SIZE[b.type] ?? 11;
+    doc.setFont("helvetica", heading ? "bold" : "normal");
+    doc.setFontSize(size);
+    const lineHeight = size * 1.3;
+    const prefix = b.type === "li" ? "•  " : "";
+    const text = prefix + (b.runs ?? []).map((r) => r.text).join("");
+    const lines: string[] = doc.splitTextToSize(text || " ", maxWidth);
+    ensureRoom(lines.length * lineHeight);
+    doc.text(lines, margin, y + size);
+    y += lines.length * lineHeight + (heading ? 6 : 4);
+  }
+
+  return doc.output("blob");
+}
+
 // -------------------------------------------------------------- binary readers
 
 async function docxToHtml(buf: ArrayBuffer): Promise<string> {
@@ -281,6 +338,75 @@ async function pptxToHtml(buf: ArrayBuffer): Promise<string> {
     }
   }
   return out.join("\n");
+}
+
+interface PdfLine {
+  text: string;
+  y: number;
+  fontSize: number;
+}
+
+/**
+ * Best-effort PDF text extraction: no layout/images survive, just running
+ * text grouped into paragraphs. pdfjs-dist's text items arrive in reading
+ * order with a per-line `hasEOL` flag but no paragraph markers, so paragraph
+ * breaks are inferred from vertical gaps between lines — a gap noticeably
+ * larger than the line's own font size reads as a blank-line break. Page
+ * boundaries always force a break, so text never runs across a page edge.
+ */
+async function pdfToHtml(buf: ArrayBuffer): Promise<string> {
+  const pdfjsLib = await import("pdfjs-dist");
+  pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
+    "pdfjs-dist/build/pdf.worker.mjs",
+    import.meta.url,
+  ).toString();
+  const doc = await pdfjsLib.getDocument({ data: new Uint8Array(buf) }).promise;
+
+  const paragraphs: string[] = [];
+  let current: string[] = [];
+  let prevY: number | null = null;
+
+  const breakParagraph = (): void => {
+    if (current.length) paragraphs.push(current.join(" "));
+    current = [];
+    prevY = null;
+  };
+
+  for (let p = 1; p <= doc.numPages; p++) {
+    const page = await doc.getPage(p);
+    const content = await page.getTextContent();
+    const lines: PdfLine[] = [];
+    let text = "";
+    let y = 0;
+    let fontSize = 10;
+    for (const item of content.items) {
+      if (!("str" in item)) continue;
+      if (!text) {
+        y = item.transform[5];
+        fontSize = Math.abs(item.transform[3]) || 10;
+      }
+      text += item.str;
+      if (item.hasEOL) {
+        if (text.trim()) lines.push({ text: text.trim(), y, fontSize });
+        text = "";
+      }
+    }
+    if (text.trim()) lines.push({ text: text.trim(), y, fontSize });
+
+    for (const line of lines) {
+      // PDF y increases upward, so reading down the page it decreases —
+      // a shrinking gap is normal line spacing, a large one is a paragraph.
+      const gap = prevY === null ? 0 : prevY - line.y;
+      if (prevY !== null && gap > line.fontSize * 1.5) breakParagraph();
+      current.push(line.text);
+      prevY = line.y;
+    }
+    breakParagraph(); // never let a paragraph span a page break
+  }
+
+  return paragraphs.length
+    ? paragraphs.map((p) => `<p>${escapeHtml(p)}</p>`).join("\n")
+    : "<p></p>";
 }
 
 // --------------------------------------------------------------- sheet bridge
@@ -346,6 +472,8 @@ async function readSource(file: File, src: DocFormat): Promise<Repr> {
       return { kind: "html", html: await docxToHtml(await file.arrayBuffer()) };
     case "odt":
       return { kind: "html", html: await odtToHtml(await file.arrayBuffer()) };
+    case "pdf":
+      return { kind: "html", html: await pdfToHtml(await file.arrayBuffer()) };
     case "pptx":
       return { kind: "html", html: await pptxToHtml(await file.arrayBuffer()) };
     case "csv":
@@ -374,6 +502,8 @@ async function writeDoc(html: string, dst: DocFormat): Promise<Blob> {
       return blocksToDocx(parseBlocks(html));
     case "odt":
       return blocksToOdt(parseBlocks(html));
+    case "pdf":
+      return blocksToPdf(parseBlocks(html));
     default:
       throw new Error(`Writing .${dst} isn't supported in the browser.`);
   }

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import * as Sentry from "@sentry/nextjs";
 
 export default function Error({
   error,
@@ -10,8 +11,9 @@ export default function Error({
   reset: () => void;
 }) {
   useEffect(() => {
-    // Surface to the console; a real deploy would send this to an error sink.
     console.error(error);
+    // No-ops when Sentry isn't initialized (NEXT_PUBLIC_SENTRY_DSN unset).
+    Sentry.captureException(error);
   }, [error]);
 
   return (

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { AuthNav } from "./auth/AuthNav";
 
 /**
@@ -10,6 +11,7 @@ export function SiteHeader() {
   return (
     <nav className="sitenav" aria-label="Primary">
       <Link href="/" className="navbrand">
+        <Image src="/logo.png" alt="" width={28} height={28} className="navlogo" priority />
         PROXIPIXEL
       </Link>
       <div className="navspacer" />
