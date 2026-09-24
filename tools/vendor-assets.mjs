@@ -2,7 +2,8 @@
 /**
  * Copies the browser-runtime assets FFmpeg.wasm needs — a UMD loader script,
  * its versioned worker chunk, and the WASM core (JS glue + .wasm binary) —
- * out of the pinned `@ffmpeg/ffmpeg` / `@ffmpeg/core` packages into
+ * plus pdf.js's worker script out of the pinned `@ffmpeg/ffmpeg` /
+ * `@ffmpeg/core` / `pdfjs-dist` packages into
  * `public/vendor/`, so the app serves them same-origin instead of fetching
  * from a third-party CDN (jsdelivr/unpkg) at runtime in every visitor's
  * browser. Runs on `postinstall`, so it's always current with whatever
@@ -56,7 +57,23 @@ copy(
   join(outDir, "ffmpeg-core/ffmpeg-core.wasm"),
 );
 
-if (!existsSync(join(outDir, "ffmpeg/ffmpeg.js"))) {
+// pdf.js worker — served as a static file rather than bundled via
+// `new URL("pdfjs-dist/build/pdf.worker.mjs", import.meta.url)`: webpack
+// emits that as an asset, and Next's production minifier then re-minifies it
+// and hoists a stray `"use strict"` in pdf.js's bundled OpenJPEG decoder into
+// a function with default params — a SyntaxError that kills the worker (and
+// its fake-worker fallback). Mozilla's own pre-minified build is used as-is.
+console.log("Vendoring pdf.js worker into public/vendor/ ...");
+const pdfjsBuild = dirname(require.resolve("pdfjs-dist"));
+copy(
+  join(pdfjsBuild, "pdf.worker.min.mjs"),
+  join(outDir, "pdfjs/pdf.worker.min.mjs"),
+);
+
+if (
+  !existsSync(join(outDir, "ffmpeg/ffmpeg.js")) ||
+  !existsSync(join(outDir, "pdfjs/pdf.worker.min.mjs"))
+) {
   console.error("Vendoring failed: expected files are missing.");
   process.exit(1);
 }

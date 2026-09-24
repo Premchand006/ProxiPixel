@@ -16,6 +16,10 @@
 export const VENDOR = {
   ffmpegBase: "/vendor/ffmpeg",
   ffcoreBase: "/vendor/ffmpeg-core",
+  // pdf.js's worker is also served from here rather than bundled — webpack's
+  // emitted copy gets re-minified by Next into invalid JS (see
+  // tools/vendor-assets.mjs).
+  pdfjsWorker: "/vendor/pdfjs/pdf.worker.min.mjs",
 } as const;
 
 /** Inject a UMD `<script>` and resolve once it has loaded (browser only). */

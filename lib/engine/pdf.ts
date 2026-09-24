@@ -1,5 +1,6 @@
 import { newCanvas, ctx2d, flatten, type Canvas } from "./canvas";
 import type { JsPDFConstructor, PdfjsModule } from "./external";
+import { VENDOR } from "./loaders";
 
 let pdfjs: PdfjsModule | null = null;
 
@@ -7,12 +8,9 @@ async function loadPdfjs(): Promise<PdfjsModule> {
   if (pdfjs) return pdfjs;
   try {
     const lib = (await import("pdfjs-dist")) as unknown as PdfjsModule;
-    // Bundler-emitted, same-origin worker URL (see pdfjs-dist's bundler docs) —
-    // webpack resolves this at build time and copies the file to static output.
-    lib.GlobalWorkerOptions.workerSrc = new URL(
-      "pdfjs-dist/build/pdf.worker.mjs",
-      import.meta.url,
-    ).toString();
+    // Same-origin vendored worker (see VENDOR.pdfjsWorker for why it isn't
+    // bundled via `new URL(..., import.meta.url)`).
+    lib.GlobalWorkerOptions.workerSrc = VENDOR.pdfjsWorker;
     pdfjs = lib;
   } catch {
     throw new Error("PDF support didn’t load");
