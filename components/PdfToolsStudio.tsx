@@ -129,7 +129,9 @@ interface ResultItem extends NamedBlob {
 export function PdfToolsStudio() {
   const [op, setOpState] = useState<OpId>("merge");
   const [files, setFiles] = useState<File[]>([]);
-  const [pageCount, setPageCount] = useState<number | null>(null);
+  const [pageCountFor, setPageCountFor] = useState<{ file: File; count: number } | null>(
+    null,
+  );
   const [params, setParams] = useState<Params>(DEFAULT_PARAMS);
   const [busy, setBusy] = useState(false);
   const [status, setStatus] = useState<{ msg: string; kind: "" | "err" }>({
@@ -142,7 +144,6 @@ export function PdfToolsStudio() {
 
   const reset = useCallback(() => {
     setFiles([]);
-    setPageCount(null);
     setResults((prev) => {
       for (const r of prev) URL.revokeObjectURL(r.url);
       return [];
@@ -159,26 +160,28 @@ export function PdfToolsStudio() {
     [reset],
   );
 
-  // Best-effort page-count hint for single-file page-range ops.
+  // Best-effort page-count hint for single-file page-range ops. The count is
+  // stored against the file it was read from, so a stale count never shows
+  // for a different (or no longer eligible) file.
+  const countFile = !meta.multiFile && files.length === 1 ? files[0]! : null;
+  const pageCount =
+    countFile && pageCountFor?.file === countFile ? pageCountFor.count : null;
   useEffect(() => {
-    if (meta.multiFile || files.length !== 1) {
-      setPageCount(null);
-      return;
-    }
+    if (!countFile) return;
     let cancelled = false;
     void (async () => {
       try {
         const { getPageCount } = await loadPdfTools();
-        const count = await getPageCount(files[0]!);
-        if (!cancelled) setPageCount(count);
+        const count = await getPageCount(countFile);
+        if (!cancelled) setPageCountFor({ file: countFile, count });
       } catch {
-        if (!cancelled) setPageCount(null);
+        if (!cancelled) setPageCountFor(null);
       }
     })();
     return () => {
       cancelled = true;
     };
-  }, [files, meta.multiFile]);
+  }, [countFile]);
 
   const addFiles = useCallback(
     (list: FileList | File[]) => {
