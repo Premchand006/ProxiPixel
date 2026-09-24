@@ -24,7 +24,7 @@
     "verify": "pnpm typecheck && pnpm lint && pnpm test && pnpm build"
   },
   "dependencies": {
-    "@ffmpeg/core": "0.12.6",
+    "@ffmpeg/core": "0.12.10",
     "@ffmpeg/ffmpeg": "0.12.10",
     "@sentry/nextjs": "10.71.0",
     "@supabase/ssr": "0.12.0",
