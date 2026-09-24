@@ -1,5 +1,6 @@
 import type { WorkBook } from "xlsx";
 import { FORMATS, type DocFormat } from "./formats";
+import { VENDOR } from "../engine/loaders";
 
 /**
  * 100%-local document & spreadsheet conversion. Every heavy library is loaded
@@ -356,10 +357,7 @@ interface PdfLine {
  */
 async function pdfToHtml(buf: ArrayBuffer): Promise<string> {
   const pdfjsLib = await import("pdfjs-dist");
-  pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
-    "pdfjs-dist/build/pdf.worker.mjs",
-    import.meta.url,
-  ).toString();
+  pdfjsLib.GlobalWorkerOptions.workerSrc = VENDOR.pdfjsWorker;
   const doc = await pdfjsLib.getDocument({ data: new Uint8Array(buf) }).promise;
 
   const paragraphs: string[] = [];
