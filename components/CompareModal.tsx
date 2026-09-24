@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import { useStudio } from "@/lib/app/store";
 import { useDialog } from "@/lib/app/use-dialog";
 
@@ -9,15 +9,21 @@ export function CompareModal() {
   const dialogRef = useDialog(!!compareItem, closeCompare);
   const boxRef = useRef<HTMLDivElement>(null);
   const [pct, setPct] = useState(50);
-  const [before, setBefore] = useState("");
   const draggingRef = useRef(false);
 
   // Render the full-res original to a data URL when the modal opens.
-  useEffect(() => {
-    if (compareItem?.canvas) setBefore(compareItem.canvas.toDataURL("image/png"));
-    else setBefore("");
+  const before = useMemo(
+    () => compareItem?.canvas?.toDataURL("image/png") ?? "",
+    [compareItem],
+  );
+
+  // Re-centre the slider for each newly opened item (state adjusted during
+  // render rather than in an effect, so there's no extra cascading render).
+  const [shownItem, setShownItem] = useState(compareItem);
+  if (shownItem !== compareItem) {
+    setShownItem(compareItem);
     setPct(50);
-  }, [compareItem]);
+  }
 
   const moveFromClientX = useCallback((clientX: number) => {
     const box = boxRef.current;

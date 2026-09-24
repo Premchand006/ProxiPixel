@@ -140,7 +140,6 @@ export function reportAndAssert(title: string, rows: ComboResult[]): void {
     `  ${r.combo}: ${r.status}` +
     (r.size ? ` (${r.size}B ${r.type})` : "") +
     (r.err ? ` [${r.err}]` : "");
-  // eslint-disable-next-line no-console
   console.log(`\n=== ${title} ===\n${rows.map(line).join("\n")}`);
   const failures = rows.filter((r) => r.status !== "ok" && r.status !== "skipped");
   expect(

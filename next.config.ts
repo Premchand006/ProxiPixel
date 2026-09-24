@@ -75,8 +75,6 @@ const nextConfig: NextConfig = {
     };
     return config;
   },
-  // Lint the server + test code too (outside next lint's default dir set).
-  eslint: { dirs: ["app", "components", "lib", "server", "tests"] },
   async headers() {
     return [
       { source: "/:path*", headers: securityHeaders },
