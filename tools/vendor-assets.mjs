@@ -48,12 +48,15 @@ copy(
   join(ffmpegRoot, "dist/umd/814.ffmpeg.js"),
   join(outDir, "ffmpeg/814.ffmpeg.js"),
 );
+// UMD core, not ESM: the class worker loads it with `importScripts()`, and
+// since @ffmpeg/ffmpeg 0.12.11 its `import()` fallback for ESM cores is
+// compiled into a stub that always throws "Cannot find module".
 copy(
-  join(coreRoot, "dist/esm/ffmpeg-core.js"),
+  join(coreRoot, "dist/umd/ffmpeg-core.js"),
   join(outDir, "ffmpeg-core/ffmpeg-core.js"),
 );
 copy(
-  join(coreRoot, "dist/esm/ffmpeg-core.wasm"),
+  join(coreRoot, "dist/umd/ffmpeg-core.wasm"),
   join(outDir, "ffmpeg-core/ffmpeg-core.wasm"),
 );
 
