@@ -15,7 +15,7 @@
   # package.json and the Node version this app is actually tested on (CI,
   # local dev). pnpm itself is pinned via the packageManager field, which
   # Netlify's corepack respects automatically.
-  NODE_VERSION = "20"
+  NODE_VERSION = "22"
 
 [[plugins]]
   package = "@netlify/plugin-nextjs"
