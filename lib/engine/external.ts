@@ -78,7 +78,7 @@ export interface FFmpegInstance {
   on(event: "log", cb: (e: { message: string }) => void): void;
   on(event: "progress", cb: (e: { progress: number }) => void): void;
   load(opts: {
-    classWorkerURL: string;
+    classWorkerURL?: string;
     coreURL: string;
     wasmURL: string;
   }): Promise<boolean>;
