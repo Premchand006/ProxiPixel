@@ -217,7 +217,7 @@ async function blocksToOdt(blocks: Block[]): Promise<Blob> {
         return `<text:list><text:list-item><text:p>${text}</text:p></text:list-item></text:list>`;
       if (b.type === "table")
         return (b.rows ?? [])
-          .map((r) => `<text:p>${r.map(escapeXml).join(" – ")}</text:p>`)
+          .map((r) => `<text:p>${r.map(escapeXml).join(" - ")}</text:p>`)
           .join("");
       return `<text:p>${text}</text:p>`;
     })
@@ -231,7 +231,7 @@ async function blocksToOdt(blocks: Block[]): Promise<Blob> {
   return zip.generateAsync({ type: "blob", mimeType: MIME.odt });
 }
 
-// Heading sizes (pt) for blocksToPdf — h1 largest, matches the visual weight
+// Heading sizes (pt) for blocksToPdf: h1 largest, matching the visual weight
 // blocksToDocx gets for free from Word's built-in heading styles.
 const PDF_HEADING_SIZE: Partial<Record<Block["type"], number>> = {
   h1: 24,
@@ -351,7 +351,7 @@ interface PdfLine {
  * Best-effort PDF text extraction: no layout/images survive, just running
  * text grouped into paragraphs. pdfjs-dist's text items arrive in reading
  * order with a per-line `hasEOL` flag but no paragraph markers, so paragraph
- * breaks are inferred from vertical gaps between lines — a gap noticeably
+ * breaks are inferred from vertical gaps between lines: a gap noticeably
  * larger than the line's own font size reads as a blank-line break. Page
  * boundaries always force a break, so text never runs across a page edge.
  */
@@ -392,8 +392,8 @@ async function pdfToHtml(buf: ArrayBuffer): Promise<string> {
     if (text.trim()) lines.push({ text: text.trim(), y, fontSize });
 
     for (const line of lines) {
-      // PDF y increases upward, so reading down the page it decreases —
-      // a shrinking gap is normal line spacing, a large one is a paragraph.
+      // PDF y increases upward, so reading down the page it decreases.
+      // A shrinking gap is normal line spacing, a large one is a paragraph.
       const gap = prevY === null ? 0 : prevY - line.y;
       if (prevY !== null && gap > line.fontSize * 1.5) breakParagraph();
       current.push(line.text);

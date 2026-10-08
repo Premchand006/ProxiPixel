@@ -1,8 +1,8 @@
--- db/storage-setup.sql — Phase 5 storage bootstrap.
+-- db/storage-setup.sql: Phase 5 storage bootstrap.
 --
 -- Creates the PRIVATE 'outputs' bucket used for user-saved results. The
 -- per-folder access policies (a user only touches {user_id}/…) already live in
--- db/policies.sql (section 7) — apply that too. Run in the Supabase SQL editor.
+-- db/policies.sql (section 7); apply that too. Run in the Supabase SQL editor.
 
 insert into storage.buckets (id, name, public)
 values ('outputs', 'outputs', false)

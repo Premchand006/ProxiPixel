@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import { PDFDocument } from "pdf-lib";
 
 // jsdom ships File/Blob without arrayBuffer()/text() (real browsers have
-// both) — swap in Node's, same fix tests/docs/convert.test.ts uses.
+// both), so swap in Node's (the same fix tests/docs/convert.test.ts uses).
 globalThis.Blob = NodeBlob as unknown as typeof Blob;
 globalThis.File = NodeFile as unknown as typeof File;
 import {

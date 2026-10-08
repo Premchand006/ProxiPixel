@@ -48,14 +48,14 @@ export function LoginForm({ initialError = "" }: { initialError?: string }) {
 
       {!isSupabaseConfigured && (
         <p className="authnote">
-          Supabase isn’t configured yet — set NEXT_PUBLIC_SUPABASE_URL and
+          Supabase isn’t configured yet. Set NEXT_PUBLIC_SUPABASE_URL and
           NEXT_PUBLIC_SUPABASE_ANON_KEY to enable sign-in.
         </p>
       )}
 
       {sent ? (
         <p className="authok">
-          Check your inbox — we sent a magic link to <b>{email}</b>.
+          Check your inbox. We sent a magic link to <b>{email}</b>.
         </p>
       ) : (
         <form onSubmit={sendMagicLink} className="authform">

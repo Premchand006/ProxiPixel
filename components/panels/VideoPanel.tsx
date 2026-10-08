@@ -147,7 +147,7 @@ export function VideoPanel() {
       )}
       <div className="warnote">
         Video runs locally via FFmpeg (~31 MB, loads on first run). Serve this
-        page over http(s) — it won’t run from a file:// double-click.
+        page over http(s). It won’t run from a file:// double-click.
       </div>
     </>
   );

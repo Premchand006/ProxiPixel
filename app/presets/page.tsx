@@ -37,7 +37,7 @@ export default async function PresetsPage() {
       </p>
       {dbError ? (
         <div className="empty">
-          Presets are unavailable — the database isn’t configured yet.
+          Presets are unavailable because the database isn’t configured yet.
         </div>
       ) : (
         <PresetList initial={items} />

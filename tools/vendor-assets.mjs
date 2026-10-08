@@ -1,22 +1,22 @@
 #!/usr/bin/env node
 /**
- * Copies the browser-runtime assets FFmpeg.wasm needs — a UMD loader script,
- * its versioned worker chunk, and the WASM core (JS glue + .wasm binary) —
+ * Copies the browser-runtime assets FFmpeg.wasm needs (a UMD loader script,
+ * its versioned worker chunk, and the WASM core: JS glue + .wasm binary)
  * plus pdf.js's worker script out of the pinned `@ffmpeg/ffmpeg` /
  * `@ffmpeg/core` / `pdfjs-dist` packages into
  * `public/vendor/`, so the app serves them same-origin instead of fetching
  * from a third-party CDN (jsdelivr/unpkg) at runtime in every visitor's
  * browser. Runs on `postinstall`, so it's always current with whatever
- * version pnpm-lock.yaml pinned; the copied output is gitignored — the
+ * version pnpm-lock.yaml pinned; the copied output is gitignored. The
  * pinned package version + lockfile integrity hash is the source of truth,
  * not these bytes.
  *
  * Deliberately plain `fs` copies of the dist files (not deep `import`/
  * `require` of them) because both packages' `exports` maps only expose their
- * main entry point, not the sibling asset files this script needs — and,
- * true of both packages, don't expose `./package.json` either. So: resolve
+ * main entry point, not the sibling asset files this script needs, and
+ * neither package exposes `./package.json` either. So: resolve
  * the (exported) main entry, then walk up from it. Both packages publish the
- * same shape — `<root>/dist/{esm,umd}/<file>` — so the root is always three
+ * same shape, `<root>/dist/{esm,umd}/<file>`, so the root is always three
  * directories above the resolved entry file, regardless of whether Node's
  * CJS resolver picked the esm or umd condition.
  */
@@ -60,12 +60,13 @@ copy(
   join(outDir, "ffmpeg-core/ffmpeg-core.wasm"),
 );
 
-// pdf.js worker — served as a static file rather than bundled via
+// pdf.js worker, served as a static file rather than bundled via
 // `new URL("pdfjs-dist/build/pdf.worker.mjs", import.meta.url)`: webpack
 // emits that as an asset, and Next's production minifier then re-minifies it
 // and hoists a stray `"use strict"` in pdf.js's bundled OpenJPEG decoder into
-// a function with default params — a SyntaxError that kills the worker (and
-// its fake-worker fallback). Mozilla's own pre-minified build is used as-is.
+// a function with default params, producing a SyntaxError that kills the
+// worker (and its fake-worker fallback). Mozilla's own pre-minified build is
+// used as-is.
 console.log("Vendoring pdf.js worker into public/vendor/ ...");
 const pdfjsBuild = dirname(require.resolve("pdfjs-dist"));
 copy(

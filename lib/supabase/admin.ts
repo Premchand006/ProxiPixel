@@ -3,7 +3,7 @@ import { createClient as createSupabaseClient } from "@supabase/supabase-js";
 import { SUPABASE_URL } from "./config";
 
 /**
- * Service-role Supabase client — bypasses RLS. SERVER-ONLY; never import into a
+ * Service-role Supabase client. Bypasses RLS. SERVER-ONLY; never import into a
  * Client Component. Used only where there is no user session but trusted access
  * is required (e.g. signing a public share's storage object). Throws if the
  * key is absent so misconfiguration fails loudly at runtime.

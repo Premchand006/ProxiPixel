@@ -10,7 +10,7 @@ import {
 } from "./watermark/inpaint.js";
 
 /**
- * Gemini watermark removal — a thin, typed adapter over the vendored
+ * Gemini watermark removal: a thin, typed adapter over the vendored
  * reverse-alpha-blending engine (`lib/engine/watermark/vendor`). Like the rest
  * of the engine it operates on {@link RawImage} (DOM-free, ImageData-shaped) so
  * the browser bridge in `lib/engine/canvas.ts` can drive it unchanged.
@@ -51,7 +51,7 @@ interface WatermarkEngine {
 }
 
 // The heavy engine (~360 KB of embedded alpha maps + detection tables) is loaded
-// on demand the first time removal runs, then cached — so the alpha maps are
+// on demand the first time removal runs, then cached, so the alpha maps are
 // decoded once and reused across an entire queue, mirroring the upstream engine.
 let enginePromise: Promise<WatermarkEngine> | null = null;
 
@@ -110,7 +110,7 @@ async function getEngine(): Promise<WatermarkEngine> {
   return enginePromise;
 }
 
-// Reconstruction gating, scored on mean luminance deviation (in 0–255 units)
+// Reconstruction gating, scored on mean luminance deviation (in 0-255 units)
 // from the local background inside the detected watermark box.
 const REC_MIN_ENGINE_RESIDUE = 4; // engine left visible residue worth replacing
 const REC_MIN_MEAN_IMPROVEMENT = 2; // reconstruction must cut mean residue by ≥ this
@@ -127,7 +127,7 @@ export async function removeWatermark(
   const engine = await getEngine();
   const W = src.width;
   const H = src.height;
-  // Keep the untouched pixels — the engine mutates src.data in place, and the
+  // Keep the untouched pixels; the engine mutates src.data in place, and the
   // reconstruction re-fits against the original.
   const original = src.data.slice();
   const { imageData, meta } = engine.process(src, options.adaptiveMode);
@@ -138,7 +138,7 @@ export async function removeWatermark(
   // Independently locate the corner watermark in the original and rebuild the
   // background under it. We adopt the reconstruction only when the engine's own
   // output still shows meaningful residue there AND the reconstruction is
-  // clearly cleaner — so confident, well-removed standard images are untouched
+  // clearly cleaner, so confident, well-removed standard images are untouched
   // while the engine's silent failures (gray box / ghost) are repaired.
   const rec = reconstructCornerWatermark({
     width: W,

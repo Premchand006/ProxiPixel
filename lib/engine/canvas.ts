@@ -24,7 +24,7 @@ export function getImageDataOf(c: Canvas): ImageData {
   return ctx2d(c).getImageData(0, 0, c.width, c.height);
 }
 
-/** Composite over white — for formats without an alpha channel. */
+/** Composite over white, for formats without an alpha channel. */
 export function flatten(c: Canvas): Canvas {
   const o = newCanvas(c.width, c.height);
   const x = ctx2d(o);

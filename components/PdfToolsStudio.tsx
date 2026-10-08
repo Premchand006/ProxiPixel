@@ -6,7 +6,7 @@ import { zipResults } from "@/lib/app/zip";
 import type { NamedBlob, PageNumberPosition } from "@/lib/engine/pdftools";
 
 // pdf-lib (~700KB) is code-split behind this dynamic import so it never
-// loads for the five tabs that don't touch PDFs — same pattern the Documents
+// loads for the five tabs that don't touch PDFs, the same pattern the Documents
 // tab uses for mammoth/docx/xlsx (see lib/docs/convert.ts).
 const loadPdfTools = () => import("@/lib/engine/pdftools");
 
@@ -65,7 +65,7 @@ const OPS: OpMeta[] = [
   {
     id: "organize",
     label: "Organize PDF",
-    blurb: "Reorder every page — list the new order, e.g. 3,1,2.",
+    blurb: "Reorder every page by listing the new order, e.g. 3,1,2.",
     multiFile: false,
     accept: "application/pdf,.pdf",
     minFiles: 1,
@@ -458,7 +458,7 @@ function OpFields({
           <input
             id="ptSplit"
             type="text"
-            placeholder='e.g. "1-3;4-6;7" — leave blank for one PDF per page'
+            placeholder='e.g. "1-3;4-6;7", or leave blank for one PDF per page'
             value={params.splitGroups}
             onChange={(e) => set({ splitGroups: e.target.value })}
           />

@@ -71,7 +71,7 @@ export function CompareModal() {
             draggingRef.current = false;
           }}
         >
-          {/* Dynamic data/object URLs — next/image isn't applicable. */}
+          {/* Dynamic data/object URLs, so next/image isn't applicable. */}
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img id="cmpBefore" alt="Original" src={before || undefined} />
           {/* eslint-disable-next-line @next/next/no-img-element */}

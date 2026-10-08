@@ -37,7 +37,7 @@ export const OUT_CONVERT: ReadonlyArray<readonly [ImageFormat, string]> = [
 /**
  * Encode an RGBA image as an uncompressed 24-bit BMP (BI_RGB), bottom-up rows,
  * BGR channel order, each row padded to a 4-byte boundary. Alpha is composited
- * over white. Pure — ported verbatim from the reference's `encodeBMP`.
+ * over white. Pure; ported verbatim from the reference's `encodeBMP`.
  */
 export function encodeBMP(img: RawImage): Uint8Array<ArrayBuffer> {
   const { width: w, height: h, data } = img;

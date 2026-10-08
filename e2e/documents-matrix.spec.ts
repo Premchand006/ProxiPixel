@@ -5,7 +5,7 @@ import { fx, runAndCollect, reportAndAssert, type ComboResult } from "./helpers"
  * Every Documents cross-conversion the UI offers. Documents uses one global
  * "Convert to" target (like Pixel's), so for each readable source we read
  * every option from that dropdown and convert to each in turn (doc⇄doc,
- * sheet⇄sheet, and the cross-family bridges) — skipping the source's own
+ * sheet⇄sheet, and the cross-family bridges), skipping the source's own
  * format, which the UI marks "Already X" and won't run.
  */
 const SOURCES = ["txt", "md", "html", "rtf", "docx", "odt", "pdf", "pptx", "csv", "xlsx", "ods"];

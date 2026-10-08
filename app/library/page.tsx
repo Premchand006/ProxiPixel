@@ -47,13 +47,13 @@ export default async function LibraryPage() {
     <main className="wrap">
       <h1 className="pagetitle">Library</h1>
       <p className="pagesub">
-        Job history for <b>{user.email}</b>. Files stay on your device — only
-        metadata is saved, plus any outputs you explicitly save to storage.
+        Job history for <b>{user.email}</b>. Files stay on your device. Only
+        metadata is saved, plus any outputs you choose to save to storage.
       </p>
 
       {dbError ? (
         <div className="empty">
-          History is unavailable — the database isn’t configured yet.
+          History is unavailable because the database isn’t configured yet.
         </div>
       ) : rows.length === 0 ? (
         <div className="empty">
@@ -79,8 +79,8 @@ export default async function LibraryPage() {
                     {j.sourceName}
                   </td>
                   <td>{j.kind}</td>
-                  <td>{j.targetFormat ?? "—"}</td>
-                  <td>{j.outputSize ? formatBytes(j.outputSize) : "—"}</td>
+                  <td>{j.targetFormat ?? "-"}</td>
+                  <td>{j.outputSize ? formatBytes(j.outputSize) : "-"}</td>
                   <td>{when(j.createdAt)}</td>
                   <td className="savedcell">
                     {signed[j.id] ? (
@@ -96,7 +96,7 @@ export default async function LibraryPage() {
                         <ShareButton jobId={j.id} />
                       </>
                     ) : (
-                      "—"
+                      "-"
                     )}
                   </td>
                 </tr>

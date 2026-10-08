@@ -24,9 +24,9 @@ const mono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "ProxiPixel — image converter, upscaler & optimizer",
+  title: "ProxiPixel: image converter, upscaler and optimizer",
   description:
-    "Privacy-first, browser-based media tools: convert, upscale, optimize, and edit images and video — all in your browser. Files never leave your device.",
+    "Convert, upscale, optimize and edit images and video in your browser. Files never leave your device.",
   icons: {
     icon: "/logo.png",
     shortcut: "/logo.png",
