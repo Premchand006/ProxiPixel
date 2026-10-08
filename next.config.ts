@@ -1,13 +1,13 @@
 import type { NextConfig } from "next";
 import { withSentryConfig } from "@sentry/nextjs";
 
-// Supabase origins (auth/storage/realtime) — the only third party the app
+// Supabase origins (auth/storage/realtime): the only third party the app
 // ever talks to at runtime. Every media library (FFmpeg.wasm, pdf.js, gifenc,
 // utif, jspdf) is vendored same-origin (see lib/engine/loaders.ts and
-// tools/vendor-assets.mjs) — nothing fetches code from a third-party CDN.
+// tools/vendor-assets.mjs), so nothing fetches code from a third-party CDN.
 const SUPABASE_ORIGINS = "https://*.supabase.co https://*.supabase.in wss://*.supabase.co";
 
-// Only allowlisted when actually configured — derived from the real DSN
+// Only allowlisted when actually configured, derived from the real DSN
 // (not a wildcarded guess) so CSP stays tight when Sentry isn't set up.
 const sentryDsn = process.env.NEXT_PUBLIC_SENTRY_DSN;
 const SENTRY_ORIGIN = sentryDsn ? new URL(sentryDsn).origin : "";
@@ -66,7 +66,7 @@ const nextConfig: NextConfig = {
     // pdfjs-dist uses top-level await; every browser this app supports
     // (evergreen Chrome/Firefox/Edge/Safari) has supported it since 2021.
     // Both flags are needed to quiet webpack's conservative default-target
-    // warning — `experiments.topLevelAwait` enables the feature, but
+    // warning: `experiments.topLevelAwait` enables the feature, but
     // webpack's warning is driven by `output.environment.asyncFunction`.
     config.experiments = { ...config.experiments, topLevelAwait: true };
     config.output.environment = {
@@ -75,13 +75,11 @@ const nextConfig: NextConfig = {
     };
     return config;
   },
-  // Lint the server + test code too (outside next lint's default dir set).
-  eslint: { dirs: ["app", "components", "lib", "server", "tests"] },
   async headers() {
     return [
       { source: "/:path*", headers: securityHeaders },
       {
-        // Vendored FFmpeg.wasm assets (see tools/vendor-assets.mjs) — fixed
+        // Vendored FFmpeg.wasm assets (see tools/vendor-assets.mjs) have fixed
         // filenames (not content-hashed), so cache for a week rather than
         // Next's usual immutable/1y: a version bump needs old cached copies
         // to expire within a bounded window, not be pinned forever.
@@ -95,7 +93,7 @@ const nextConfig: NextConfig = {
 };
 
 // Sentry's build wrapper needs org/project (and, for source-map upload, an
-// auth token) — all sourced from the account the user sets up, not something
+// auth token), all sourced from the account the user sets up, not something
 // this repo can assume. Skip it entirely when unconfigured so the build is
 // identical to a plain Next.js build until Sentry is actually wired up.
 const sentryOrg = process.env.SENTRY_ORG;

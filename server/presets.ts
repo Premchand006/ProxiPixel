@@ -16,7 +16,7 @@ import {
 } from "./validation";
 import { allow } from "./rate-limit";
 
-const TOO_MANY = "Too many requests — slow down.";
+const TOO_MANY = "Too many requests. Please slow down.";
 
 /** Save a named preset for the current tool. */
 export async function savePreset(

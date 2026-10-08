@@ -1,4 +1,4 @@
-// db/schema.ts — source of truth for the database (Drizzle ORM, Postgres).
+// db/schema.ts: source of truth for the database (Drizzle ORM, Postgres).
 // RLS policies live in db/policies.sql and MUST be applied alongside this schema.
 
 import {
@@ -16,7 +16,7 @@ export const profiles = pgTable("profiles", {
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
 });
 
-// One row per locally-completed job. Metadata only — never raw media.
+// One row per locally-completed job. Metadata only, never raw media.
 export const jobs = pgTable("jobs", {
   id: uuid("id").primaryKey().defaultRandom(),
   userId: uuid("user_id").notNull(),           // = auth.uid()

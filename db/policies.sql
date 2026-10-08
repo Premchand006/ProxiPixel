@@ -1,6 +1,6 @@
--- db/policies.sql — Row Level Security. Apply AFTER tables exist.
+-- db/policies.sql: Row Level Security. Apply AFTER tables exist.
 -- Run in the Supabase SQL editor (or as a migration). Without these, the anon key
--- can read/write everything. RLS is the security boundary — do not skip it.
+-- can read/write everything. RLS is the security boundary, so do not skip it.
 
 -- 1) Auto-create a profile when a new auth user signs up.
 create or replace function public.handle_new_user()

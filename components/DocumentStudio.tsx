@@ -21,8 +21,8 @@ interface DocItem {
   result?: { url: string; name: string; size: number };
 }
 
-// Every writable format is a valid target for every readable source — the
-// doc/sheet families bridge through HTML tables (see lib/docs/formats.ts) —
+// Every writable format is a valid target for every readable source. The
+// doc/sheet families bridge through HTML tables (see lib/docs/formats.ts),
 // so one global target works uniformly, same as the Pixel tab's "Convert to".
 const WRITABLE_FORMATS = (Object.keys(FORMATS) as DocFormat[]).filter(
   (f) => FORMATS[f].canWrite,
@@ -66,7 +66,7 @@ export function DocumentStudio() {
           status: readable
             ? ""
             : src
-              ? "Legacy binary format — import not supported"
+              ? "Legacy binary format (import not supported)"
               : "Unsupported file type",
           statusKind: readable ? "" : "err",
         };
@@ -173,8 +173,8 @@ export function DocumentStudio() {
         </div>
         <h2>Drop documents &amp; spreadsheets to convert</h2>
         <p>
-          Drag &amp; drop or <span className="pick">click to browse</span> — all
-          conversion runs locally, nothing is uploaded
+          Drag &amp; drop or <span className="pick">click to browse</span>. All
+          conversion runs locally and nothing is uploaded
         </p>
         <div className="formats">
           {["DOCX", "ODT", "RTF", "PDF", "HTML", "MD", "TXT", "PPTX", "XLSX", "CSV", "ODS"].map(
@@ -239,7 +239,7 @@ export function DocumentStudio() {
       )}
 
       {items.length === 0 ? (
-        <div className="empty">No files yet — add some above to get started.</div>
+        <div className="empty">No files yet. Add some above to get started.</div>
       ) : (
         <div className="doclist">
           {items.map((it) => (
@@ -249,7 +249,7 @@ export function DocumentStudio() {
                   {it.file.name}
                 </div>
                 <div className="stats">
-                  <span className="pill">{it.src ? FORMATS[it.src].label : "—"}</span>{" "}
+                  <span className="pill">{it.src ? FORMATS[it.src].label : "-"}</span>{" "}
                   · <b>{formatBytes(it.size)}</b>
                   {it.result && (
                     <>

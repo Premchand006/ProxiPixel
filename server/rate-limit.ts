@@ -5,8 +5,8 @@ import { Redis } from "@upstash/redis";
  * Rate limiter for server actions. Backed by Upstash Redis when configured
  * (`UPSTASH_REDIS_REST_URL` / `UPSTASH_REDIS_REST_TOKEN`) so limits hold
  * across Vercel's multiple/ephemeral function instances; falls back to an
- * in-memory fixed-window limiter otherwise — a sensible default for local
- * dev or a single-instance deploy, but it resets on every redeploy and
+ * in-memory fixed-window limiter otherwise. That is a sensible default for
+ * local dev or a single-instance deploy, but it resets on every redeploy and
  * doesn't share state across instances. The in-memory core (`rateLimit`) is
  * pure (time injected) so it stays unit-testable regardless of which backend
  * `allow()` picks.
@@ -78,7 +78,7 @@ function getRedis(): Redis {
   return redis;
 }
 
-// One Ratelimit instance per distinct (limit, window) pair — its algorithm
+// One Ratelimit instance per distinct (limit, window) pair; its algorithm
 // parameters are fixed at construction, and reusing instances lets the
 // Upstash client reuse its connection instead of reconnecting per call.
 const limiters = new Map<string, Ratelimit>();
@@ -100,7 +100,7 @@ function getLimiter(limit: number, windowMs: number): Ratelimit {
 /**
  * Returns true if the call is within the limit for `key`. Prefers Redis when
  * configured; on a Redis error (network blip, Upstash outage) it fails open
- * to the in-memory limiter rather than blocking every mutating action — a
+ * to the in-memory limiter rather than blocking every mutating action. A
  * rate limiter going briefly soft under its own store's failure is a better
  * trade than an outage in a dependency taking the app down.
  */

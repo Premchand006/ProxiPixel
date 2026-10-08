@@ -15,8 +15,8 @@ export function OptimizePanel() {
     op.mode === "size"
       ? lossy
         ? "Binary-searches quality to land just under your size cap."
-        : "Target size only applies to JPEG/WebP/AVIF — this format ignores it and encodes once."
-      : "Smart pass finds the best quality that fits your target, then reports the savings.";
+        : "Target size only applies to JPEG, WebP and AVIF. This format ignores it and encodes once."
+      : "Encodes once at the chosen quality and reports the savings.";
 
   return (
     <>

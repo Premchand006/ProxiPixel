@@ -2,7 +2,7 @@ import { newCanvas, ctx2d, type Canvas } from "./canvas";
 import type { UtifModule } from "./external";
 
 /**
- * Decode any browser-native image (PNG/JPEG/WebP/AVIF/GIF/BMP — and HEIC on
+ * Decode any browser-native image (PNG/JPEG/WebP/AVIF/GIF/BMP, and HEIC on
  * platforms that decode it natively, e.g. Safari/iOS/macOS) via `Image`.
  * Rejects if the blob can't be decoded, so HEIC callers can fall back to the
  * software decoder.
@@ -41,8 +41,8 @@ async function loadUTIF(): Promise<UtifModule> {
 
 /**
  * Decode a HEIC/HEIF file to a canvas. Tries the browser's native decoder
- * first — Safari/iOS/macOS read HEIC directly, which is faster and preserves
- * EXIF orientation/colour — then falls back to the `heic-to` software decoder
+ * first (Safari/iOS/macOS read HEIC directly, which is faster and preserves
+ * EXIF orientation/colour), then falls back to the `heic-to` software decoder
  * (a current `libheif` build) for browsers without native support
  * (Chrome/Firefox/Edge). Throws a precise error if neither path can read it.
  */
@@ -51,7 +51,7 @@ async function decodeHeic(file: File): Promise<Canvas> {
   try {
     return await blobToCanvas(file);
   } catch {
-    /* no native HEIC support — fall through to the software decoder */
+    /* no native HEIC support; fall through to the software decoder */
   }
 
   // 2) Software decode via heic-to (libheif/WASM in a worker). The CSP build

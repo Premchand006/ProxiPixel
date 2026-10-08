@@ -2,10 +2,10 @@ import { PDFDocument, degrees, StandardFonts, rgb } from "pdf-lib";
 
 /**
  * PDF page-manipulation tools (merge, split, remove/extract/organize pages,
- * rotate, crop, page numbers). Built on pdf-lib, entirely client-side — same
- * "never leaves your device" guarantee as the rest of the engine. Image ->
+ * rotate, crop, page numbers). Built on pdf-lib, entirely client-side, with the
+ * same "never leaves your device" guarantee as the rest of the engine. Image ->
  * PDF wrapping (a single image as a one-page PDF) lives in lib/engine/pdf.ts,
- * used by the image tool panels' format dropdowns — this module is PDF-page
+ * used by the image tool panels' format dropdowns; this module is PDF-page
  * operations only.
  */
 
@@ -49,7 +49,7 @@ export function parsePageRanges(spec: string, pageCount: number): number[] {
   const addOne = (n: number, raw: string): void => {
     if (!Number.isInteger(n) || n < 1 || n > pageCount) {
       throw new Error(
-        `Page ${raw} is out of range — this PDF has ${pageCount} page${pageCount === 1 ? "" : "s"}`,
+        `Page ${raw} is out of range. This PDF has ${pageCount} page${pageCount === 1 ? "" : "s"}`,
       );
     }
     if (!seen.has(n)) {
@@ -78,7 +78,7 @@ export function parsePageRanges(spec: string, pageCount: number): number[] {
 }
 
 /**
- * Parse a full reordering spec — every page must appear exactly once (unlike
+ * Parse a full reordering spec: every page must appear exactly once (unlike
  * {@link parsePageRanges}, a missing or repeated page is an error here, since
  * "organize" has to account for the whole document).
  */
@@ -185,7 +185,7 @@ export async function rotatePages(
 /**
  * Crop by insetting `marginPt` points from every edge of the page's visible
  * area. Applies to all pages if `spec` is omitted. A simple uniform-margin
- * crop rather than four independent edges — covers the common case (trim a
+ * crop rather than four independent edges; it covers the common case (trim a
  * scanned border, tighten margins) without a visual crop-box editor.
  */
 export async function cropPages(

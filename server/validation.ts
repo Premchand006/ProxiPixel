@@ -61,7 +61,7 @@ export interface JobRowInsert {
 
 /**
  * Build the row to insert, forcing `userId` from the authenticated session.
- * The client can never set or override identity — that always comes from the
+ * The client can never set or override identity; that always comes from the
  * server-verified user. Kept pure so the enforcement is directly testable.
  */
 export function buildJobRow(userId: string, input: JobInput): JobRowInsert {

@@ -7,26 +7,26 @@ import "./globals.css";
 const display = Space_Grotesk({
   subsets: ["latin"],
   weight: ["500", "600", "700"],
-  variable: "--font-display",
+  variable: "--ff-display",
   display: "swap",
 });
 const body = Inter({
   subsets: ["latin"],
   weight: ["400", "500", "600"],
-  variable: "--font-body",
+  variable: "--ff-body",
   display: "swap",
 });
 const mono = JetBrains_Mono({
   subsets: ["latin"],
   weight: ["400", "500", "600"],
-  variable: "--font-mono",
+  variable: "--ff-mono",
   display: "swap",
 });
 
 export const metadata: Metadata = {
-  title: "ProxiPixel — image converter, upscaler & optimizer",
+  title: "ProxiPixel: image converter, upscaler and optimizer",
   description:
-    "Privacy-first, browser-based media tools: convert, upscale, optimize, and edit images and video — all in your browser. Files never leave your device.",
+    "Convert, upscale, optimize and edit images and video in your browser. Files never leave your device.",
   icons: {
     icon: "/logo.png",
     shortcut: "/logo.png",

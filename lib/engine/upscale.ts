@@ -11,7 +11,7 @@ export const UHD_4K_LONG_EDGE = 3840;
 
 /**
  * sRGB(0..255) → linear-light(0..255). Resampling and blurring should average
- * light *linearly* — averaging gamma-encoded values darkens edges and dulls
+ * light *linearly*: averaging gamma-encoded values darkens edges and dulls
  * highlights. This LUT + {@link lin2srgb} let the pipeline work in linear light.
  */
 const SRGB_TO_LINEAR = (() => {
@@ -146,7 +146,7 @@ function boxBlurSeparableF32(
 }
 
 /**
- * Smooth (≈ Gaussian) blur via three box-blur passes — the box-filter halos
+ * Smooth (≈ Gaussian) blur via three box-blur passes; the box-filter halos
  * that a single pass leaves around edges average out, so unsharp masking built
  * on it sharpens cleanly instead of ringing.
  */
@@ -212,7 +212,7 @@ export function applyClarity(img: RawImage, amount: number): RawImage {
 }
 
 /**
- * High-quality separable Lanczos (a=3) resampler — sharper than canvas
+ * High-quality separable Lanczos (a=3) resampler, sharper than canvas
  * resizing. Weights are normalized per output sample, so a constant-color
  * source maps to the same constant color. Ported verbatim (canvas I/O replaced
  * by `RawImage` so it is pure and testable).
@@ -348,7 +348,7 @@ function buildLanczosWeights(
 /**
  * Gamma-correct (linear-light) Lanczos resample. Identical kernel to
  * {@link lanczosResize}, but RGB is converted to linear light before sampling
- * and back to sRGB after — so high-contrast edges keep their brightness instead
+ * and back to sRGB after, so high-contrast edges keep their brightness instead
  * of darkening, which is the main visible quality win when enlarging to 4K.
  */
 export function lanczosResizeLinear(

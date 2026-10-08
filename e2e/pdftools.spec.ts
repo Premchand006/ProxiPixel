@@ -2,14 +2,14 @@ import { test, expect, type Page } from "@playwright/test";
 import { PDFDocument } from "pdf-lib";
 import { readFile } from "node:fs/promises";
 
-// Verifies the PDF Tools tab end-to-end in a real browser — the pdf-lib
+// Verifies the PDF Tools tab end-to-end in a real browser: the pdf-lib
 // engine itself is unit-tested (tests/engine/pdftools.test.ts); this checks
 // the UI actually wires operation selection, file upload, and params through
 // to it, and that a real download comes back.
 
 async function gotoPdfTools(page: Page): Promise<void> {
   await page.goto("/");
-  await page.getByRole("tab", { name: "PDF Tools" }).click();
+  await page.getByRole("tab", { name: "PDF tools" }).click();
   await expect(page.getByRole("button", { name: "Merge PDF", exact: true })).toBeVisible();
 }
 

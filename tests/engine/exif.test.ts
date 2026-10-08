@@ -3,7 +3,7 @@ import { detectExifJPEG } from "@/lib/engine/exif";
 
 /**
  * Build a minimal JPEG: SOI + APP1/Exif with a little-endian IFD0 holding the
- * three tags ProxiPixel surfaces — Make (0x010F, camera), DateTime (0x0132,
+ * three tags ProxiPixel surfaces: Make (0x010F, camera), DateTime (0x0132,
  * date), and the GPS IFD pointer (0x8825).
  */
 function jpegWithExifTags(tags: number[]): ArrayBuffer {

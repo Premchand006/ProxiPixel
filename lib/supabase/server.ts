@@ -6,7 +6,7 @@ import { SUPABASE_ANON_KEY, SUPABASE_URL } from "./config";
 /**
  * Server-side Supabase client bound to the request's cookies. Use in Server
  * Components, Route Handlers, and Server Actions. Never trusts the client for
- * identity — always re-derive the user via `auth.getUser()`.
+ * identity; always re-derive the user via `auth.getUser()`.
  */
 export async function createClient(): Promise<SupabaseClient> {
   const cookieStore = await cookies();

@@ -18,9 +18,15 @@ export function setFFmpegCallbacks(c: FFmpegCallbacks): void {
 }
 
 /**
- * Load FFmpeg.wasm (single-threaded core) on first use. Uses the versioned
- * class worker (`814.ffmpeg.js`) per the project's FFmpeg notes; no
- * cross-origin isolation required. Concurrent callers share one load.
+ * Load FFmpeg.wasm (single-threaded core) on first use; no cross-origin
+ * isolation required. Concurrent callers share one load.
+ *
+ * No `classWorkerURL`: passing one makes @ffmpeg/ffmpeg spawn a *module*
+ * worker, where `importScripts()` is unavailable and (since 0.12.11) its
+ * `import()` fallback is a broken stub. Left out, it spawns a classic worker
+ * from its own `814.ffmpeg.js` chunk, resolved next to the injected
+ * `ffmpeg.js` (same-origin under /vendor/ffmpeg), which `importScripts()` the
+ * vendored UMD core.
  */
 export async function loadFFmpeg(): Promise<FFmpegInstance> {
   if (ffmpeg) return ffmpeg;
@@ -38,10 +44,6 @@ export async function loadFFmpeg(): Promise<FFmpegInstance> {
       cbs.onProgress?.(progress);
     });
     await inst.load({
-      classWorkerURL: await toBlobURL(
-        `${VENDOR.ffmpegBase}/814.ffmpeg.js`,
-        "text/javascript",
-      ),
       coreURL: await toBlobURL(
         `${VENDOR.ffcoreBase}/ffmpeg-core.js`,
         "text/javascript",

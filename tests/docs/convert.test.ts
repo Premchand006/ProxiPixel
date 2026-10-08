@@ -114,10 +114,10 @@ describe("spreadsheet conversions", () => {
 });
 
 describe("PDF conversions", () => {
-  // Writer only (jsPDF, no worker involved) — Node-testable. The reader
+  // Writer only (jsPDF, no worker involved), so Node-testable. The reader
   // (pdfjs-dist text extraction) needs a real Worker served from the app's
-  // origin (`/vendor/pdfjs/pdf.worker.min.mjs`, see VENDOR.pdfjsWorker) —
-  // there's no server under Vitest to load it from. Covered by the "pdf"
+  // origin (`/vendor/pdfjs/pdf.worker.min.mjs`, see VENDOR.pdfjsWorker),
+  // and there's no server under Vitest to load it from. Covered by the "pdf"
   // source in e2e/documents-matrix.spec.ts instead.
   it("md → pdf produces a valid PDF file", async () => {
     const { bytes, blob } = await convert(

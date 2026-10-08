@@ -18,9 +18,9 @@ jobs:
 
       - uses: pnpm/action-setup@v4
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
-          node-version: 20
+          node-version: 22
           cache: pnpm
 
       - name: Install dependencies
@@ -33,8 +33,8 @@ jobs:
 
       - name: Audit production dependencies
         # Scoped to --prod: devDependency findings (test/lint/CI tooling that
-        # never ships) are tracked via Dependabot instead of blocking merges —
-        # see .github/dependabot.yml. Anything reachable from the shipped app
+        # never ships) are tracked via Dependabot instead of blocking merges
+        # (see .github/dependabot.yml). Anything reachable from the shipped app
         # at high/critical severity fails the build.
         run: pnpm audit --prod --audit-level high
 
@@ -51,9 +51,9 @@ jobs:
 
       - uses: pnpm/action-setup@v4
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
-          node-version: 20
+          node-version: 22
           cache: pnpm
 
       - name: Install dependencies

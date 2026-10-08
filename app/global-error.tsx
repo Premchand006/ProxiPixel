@@ -5,7 +5,7 @@ import * as Sentry from "@sentry/nextjs";
 import "./globals.css";
 
 /**
- * Root-level error boundary — catches errors in the root layout itself,
+ * Root-level error boundary. Catches errors in the root layout itself,
  * which app/error.tsx can't (it's rendered inside the layout it would need
  * to replace). Sentry.captureException no-ops when Sentry isn't initialized.
  */

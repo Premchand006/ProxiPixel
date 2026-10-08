@@ -137,24 +137,24 @@ export const INPUTS = [
 
 export const TAB_TITLES: Record<Mode, string> = {
   convert: "Drop images to convert",
-  upscale: "Drop images to enhance",
+  upscale: "Drop images to upscale",
   optimize: "Drop images to optimize",
   watermark: "Drop Gemini images to remove watermarks",
-  video: "Drop videos to convert & enhance",
+  video: "Drop videos to convert, trim or crop",
   documents: "Drop documents & spreadsheets to convert",
   pdftools: "Drop PDFs to edit",
 };
 
 /** One-line statement of what each tab is for, shown under the tab bar and as
- *  each tab button's tooltip — so the six tools read as distinct, not as an
+ *  each tab button's tooltip, so the tools read as distinct, not as an
  *  undifferentiated row of labels. */
 export const TAB_DESCRIPTIONS: Record<Mode, string> = {
-  convert: "Change an image's file format — no compression or resizing applied.",
-  upscale: "Enlarge an image (up to 4K) with sharpening — for making images bigger.",
-  optimize: "Shrink file size to a target quality or target KB — for making images smaller.",
+  convert: "Change an image's file format without compressing or resizing it.",
+  upscale: "Enlarge an image, up to 4K, with sharpening.",
+  optimize: "Shrink an image to a target quality or a target size in KB.",
   watermark: "Remove the visible Gemini watermark from an AI-generated image.",
   video: "Transcode, trim, crop, or mute a video clip.",
-  documents: "Convert documents and spreadsheets — Word, Markdown, HTML, Excel, CSV, and more.",
+  documents: "Convert documents and spreadsheets: Word, Markdown, HTML, Excel, CSV and more.",
   pdftools: "Merge, split, reorder, rotate, crop, and add page numbers to a PDF.",
 };
 

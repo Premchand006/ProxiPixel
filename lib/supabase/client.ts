@@ -4,7 +4,7 @@ import { createBrowserClient } from "@supabase/ssr";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { SUPABASE_ANON_KEY, SUPABASE_URL } from "./config";
 
-// Single browser client per tab — avoids multiple GoTrue instances.
+// Single browser client per tab, which avoids multiple GoTrue instances.
 let client: SupabaseClient | undefined;
 
 export function createClient(): SupabaseClient {

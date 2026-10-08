@@ -81,7 +81,7 @@ export interface ComboResult {
  * Whether this browser can actually *encode* AVIF via canvas. Playwright's
  * bundled Chromium omits the AVIF encoder (it still decodes AVIF), so `→avif`
  * outputs fall back to PNG here and are skipped rather than failed. Real
- * Chrome/Edge encode AVIF fine — the app gates on this via avifSupported().
+ * Chrome/Edge encode AVIF fine; the app gates on this via avifSupported().
  */
 export async function avifEncodeSupported(page: Page): Promise<boolean> {
   return page.evaluate(async () => {
@@ -140,7 +140,6 @@ export function reportAndAssert(title: string, rows: ComboResult[]): void {
     `  ${r.combo}: ${r.status}` +
     (r.size ? ` (${r.size}B ${r.type})` : "") +
     (r.err ? ` [${r.err}]` : "");
-  // eslint-disable-next-line no-console
   console.log(`\n=== ${title} ===\n${rows.map(line).join("\n")}`);
   const failures = rows.filter((r) => r.status !== "ok" && r.status !== "skipped");
   expect(

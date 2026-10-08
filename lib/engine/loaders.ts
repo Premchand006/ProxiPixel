@@ -2,12 +2,12 @@
  * Runtime loaders for the browser-only media engine.
  *
  * gifenc, utif, jspdf, and pdfjs-dist are real npm dependencies now (see
- * package.json) — call sites `import()` them directly and code-split
+ * package.json). Call sites `import()` them directly and code-split
  * naturally, so the core PNG/JPEG/WebP/BMP path still never pulls them in.
  *
  * FFmpeg.wasm is the one exception: its loader (`ffmpeg.js`) and core
- * (`ffmpeg-core.js` + `.wasm`) are fetched by URL at runtime — that's how
- * `@ffmpeg/ffmpeg` itself works, not something ProxiPixel chose — so they
+ * (`ffmpeg-core.js` + `.wasm`) are fetched by URL at runtime. That's how
+ * `@ffmpeg/ffmpeg` itself works, not something ProxiPixel chose, so they
  * can't just be `import()`ed. `VENDOR` points those fetches at same-origin
  * copies under `public/vendor/`, produced from the pinned package versions by
  * `tools/vendor-assets.mjs` on `postinstall`. Nothing in the engine fetches
@@ -16,8 +16,8 @@
 export const VENDOR = {
   ffmpegBase: "/vendor/ffmpeg",
   ffcoreBase: "/vendor/ffmpeg-core",
-  // pdf.js's worker is also served from here rather than bundled — webpack's
-  // emitted copy gets re-minified by Next into invalid JS (see
+  // pdf.js's worker is also served from here rather than bundled, because
+  // webpack's emitted copy gets re-minified by Next into invalid JS (see
   // tools/vendor-assets.mjs).
   pdfjsWorker: "/vendor/pdfjs/pdf.worker.min.mjs",
 } as const;
