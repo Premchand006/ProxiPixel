@@ -28,7 +28,7 @@
     "@ffmpeg/ffmpeg": "0.12.10",
     "@sentry/nextjs": "10.71.0",
     "@supabase/ssr": "0.12.0",
-    "@supabase/supabase-js": "2.108.2",
+    "@supabase/supabase-js": "2.112.4",
     "@upstash/ratelimit": "2.0.8",
     "@upstash/redis": "1.38.2",
     "docx": "9.7.1",
