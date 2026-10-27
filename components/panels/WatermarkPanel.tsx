@@ -77,7 +77,7 @@ export function WatermarkPanel() {
       <RunButton />
       <div className="hint" id="wmHint">
         Removes Gemini&rsquo;s visible bottom-right watermark with exact reverse
-        alpha blending — lossless on supported sizes. PNG keeps the result
+        alpha blending, which is lossless on supported sizes. PNG keeps the result
         pixel-perfect; pick a lossy format only if you need a smaller file.
       </div>
     </>

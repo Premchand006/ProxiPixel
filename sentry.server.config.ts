@@ -1,4 +1,4 @@
-// Server-side (Node runtime) Sentry init — server actions, RSC. No-op when
+// Server-side (Node runtime) Sentry init (server actions, RSC). No-op when
 // NEXT_PUBLIC_SENTRY_DSN isn't set (see sentry.client.config.ts).
 import * as Sentry from "@sentry/nextjs";
 

@@ -167,8 +167,8 @@ export function StudioProvider({ children }: { children: ReactNode }) {
   }, []);
 
   // Switching tools clears stale results (matches the reference). Close any
-  // open modal first — it holds a snapshot whose result URL is about to be
-  // revoked — and drop the now-stale persistence state for each item.
+  // open modal first (it holds a snapshot whose result URL is about to be
+  // revoked) and drop the now-stale persistence state for each item.
   const setMode = useCallback((m: Mode) => {
     setCompareItem(null);
     setVideoItem(null);

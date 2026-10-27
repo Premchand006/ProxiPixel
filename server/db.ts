@@ -4,7 +4,7 @@ import postgres from "postgres";
 import * as schema from "@/db/schema";
 
 /**
- * Drizzle client over the Supabase Postgres connection. Server-only — this
+ * Drizzle client over the Supabase Postgres connection. Server-only; this
  * connects with DATABASE_URL (full privileges, bypasses RLS), so every caller
  * MUST scope queries by the authenticated user id. RLS in db/policies.sql is
  * defense-in-depth for any direct anon-key access.

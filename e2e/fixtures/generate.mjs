@@ -4,7 +4,7 @@
  * hand-encoded (sharp can't write it), and office docs come from the app's own
  * `docx`/`xlsx` dependencies. Formats sharp/Node can't synthesize (HEIC, PDF,
  * video, ODT, PPTX) are fetched by `download.mjs`. `sharp` is a transient
- * dev-only generation tool and is removed during repo cleanup — the produced
+ * dev-only generation tool and is removed during repo cleanup; the produced
  * fixtures are committed, so this script need not run in CI.
  */
 import { createRequire } from "node:module";
@@ -170,7 +170,7 @@ async function main() {
   writeFileSync(out("sample.ods"), XLSX.write(wb, { bookType: "ods", type: "buffer" }));
   made.push("sample.docx/xlsx/ods");
 
-  // ---- ODT (text) — shaped to match odtToHtml() in lib/docs/convert.ts ----
+  // ---- ODT (text), shaped to match odtToHtml() in lib/docs/convert.ts ----
   const odtContent =
     '<?xml version="1.0" encoding="UTF-8"?>\n' +
     '<office:document-content xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" ' +
@@ -192,7 +192,7 @@ async function main() {
   odt.file("META-INF/manifest.xml", odtManifest);
   writeFileSync(out("sample.odt"), await odt.generateAsync({ type: "nodebuffer" }));
 
-  // ---- PPTX — shaped to match pptxToHtml() (reads ppt/slides/slideN.xml a:t) ----
+  // ---- PPTX, shaped to match pptxToHtml() (reads ppt/slides/slideN.xml a:t) ----
   const slide = (lines) =>
     '<?xml version="1.0" encoding="UTF-8"?>\n' +
     '<p:sld xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main" ' +
@@ -214,7 +214,7 @@ async function main() {
   writeFileSync(out("sample.pptx"), await pptx.generateAsync({ type: "nodebuffer" }));
   made.push("sample.odt/pptx");
 
-  // ---- PDF — minimal but valid 1-page doc with text + a filled rectangle ----
+  // ---- PDF: minimal but valid 1-page doc with text + a filled rectangle ----
   writeFileSync(out("sample.pdf"), buildPdf());
   made.push("sample.pdf");
 

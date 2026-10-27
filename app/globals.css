@@ -1,11 +1,55 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
+@theme {
+  --color-ink: var(--ink);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-line: var(--line);
+  --color-line-soft: var(--line-soft);
+  --color-text: var(--text);
+  --color-muted: var(--muted);
+  --color-faint: var(--faint);
+  --color-cyan: var(--cyan);
+  --color-magenta: var(--magenta);
+  --color-amber: var(--amber);
+  --color-good: var(--good);
+  --color-bad: var(--bad);
+
+  /* next/font's variables are --ff-* (app/layout.tsx), not --font-*: Tailwind
+     v4 declares its --font-* theme keys on :root, where a same-named
+     next/font variable would become a self-referencing cycle. */
+  --font-display: var(--ff-display), sans-serif;
+  --font-body: var(--ff-body), sans-serif;
+  --font-mono: var(--ff-mono), ui-monospace, monospace;
+
+  --text-wordmark: clamp(30px, 5vw, 44px);
+  --text-wordmark--line-height: 1;
+  --text-drop-title: clamp(18px, 2.5vw, 22px);
+  --text-drop-title--line-height: 1.2;
+}
+
+/*
+  The default border color has changed to `currentcolor` in Tailwind CSS v4,
+  so we've added these compatibility styles to make sure everything still
+  looks the same as it did with Tailwind CSS v3.
+
+  If we ever want to remove these styles, we need to add an explicit border
+  color utility to any element that depends on these defaults.
+*/
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-200, currentcolor);
+  }
+}
 
 /*
  * Design ported from reference/legacy-index.html. Color + spacing tokens are
  * CSS custom properties (also exposed to Tailwind via tailwind.config.ts).
- * Fonts come from next/font (--font-display / --font-body / --font-mono).
+ * Fonts come from next/font (--ff-display / --ff-body / --ff-mono).
  */
 :root {
   --ink: #0f1117;
@@ -21,9 +65,9 @@
   --amber: #ffc65a;
   --good: #5be8a6;
   --bad: #ff7a7a;
-  --display: var(--font-display), "Space Grotesk", sans-serif;
-  --body: var(--font-body), "Inter", sans-serif;
-  --mono: var(--font-mono), "JetBrains Mono", ui-monospace, monospace;
+  --display: var(--ff-display), "Space Grotesk", sans-serif;
+  --body: var(--ff-body), "Inter", sans-serif;
+  --mono: var(--ff-mono), "JetBrains Mono", ui-monospace, monospace;
 }
 
 * {
@@ -261,7 +305,8 @@ header.top {
 }
 select,
 input[type="number"],
-input[type="text"] {
+input[type="text"],
+input[type="email"] {
   appearance: none;
   background: var(--surface-2);
   color: var(--text);

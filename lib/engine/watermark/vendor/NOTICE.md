@@ -1,16 +1,16 @@
-# Third-party attribution — vendored watermark engine
+# Third-party attribution: vendored watermark engine
 
 The code under `lib/engine/watermark/vendor/` is a vendored build of two
 upstream projects, both released under the MIT License. Their copyright and
 permission notices are retained below as required by the MIT License.
 
-## gemini-watermark-remover — © GargantuaX
+## gemini-watermark-remover (© GargantuaX)
 
 A JavaScript port of the Gemini Watermark Tool.
 Source: https://github.com/GargantuaX/gemini-watermark-remover
 License: MIT
 
-## GeminiWatermarkTool — © Allen Kuo (allenk)
+## GeminiWatermarkTool (© Allen Kuo, allenk)
 
 The original reverse-alpha-blending method and calibrated alpha masks.
 Source: https://github.com/allenk/GeminiWatermarkTool

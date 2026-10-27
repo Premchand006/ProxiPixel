@@ -6,7 +6,7 @@ import { zipResults } from "@/lib/app/zip";
 import type { NamedBlob, PageNumberPosition } from "@/lib/engine/pdftools";
 
 // pdf-lib (~700KB) is code-split behind this dynamic import so it never
-// loads for the five tabs that don't touch PDFs — same pattern the Documents
+// loads for the five tabs that don't touch PDFs, the same pattern the Documents
 // tab uses for mammoth/docx/xlsx (see lib/docs/convert.ts).
 const loadPdfTools = () => import("@/lib/engine/pdftools");
 
@@ -65,7 +65,7 @@ const OPS: OpMeta[] = [
   {
     id: "organize",
     label: "Organize PDF",
-    blurb: "Reorder every page — list the new order, e.g. 3,1,2.",
+    blurb: "Reorder every page by listing the new order, e.g. 3,1,2.",
     multiFile: false,
     accept: "application/pdf,.pdf",
     minFiles: 1,
@@ -129,7 +129,9 @@ interface ResultItem extends NamedBlob {
 export function PdfToolsStudio() {
   const [op, setOpState] = useState<OpId>("merge");
   const [files, setFiles] = useState<File[]>([]);
-  const [pageCount, setPageCount] = useState<number | null>(null);
+  const [pageCountFor, setPageCountFor] = useState<{ file: File; count: number } | null>(
+    null,
+  );
   const [params, setParams] = useState<Params>(DEFAULT_PARAMS);
   const [busy, setBusy] = useState(false);
   const [status, setStatus] = useState<{ msg: string; kind: "" | "err" }>({
@@ -142,7 +144,6 @@ export function PdfToolsStudio() {
 
   const reset = useCallback(() => {
     setFiles([]);
-    setPageCount(null);
     setResults((prev) => {
       for (const r of prev) URL.revokeObjectURL(r.url);
       return [];
@@ -159,26 +160,28 @@ export function PdfToolsStudio() {
     [reset],
   );
 
-  // Best-effort page-count hint for single-file page-range ops.
+  // Best-effort page-count hint for single-file page-range ops. The count is
+  // stored against the file it was read from, so a stale count never shows
+  // for a different (or no longer eligible) file.
+  const countFile = !meta.multiFile && files.length === 1 ? files[0]! : null;
+  const pageCount =
+    countFile && pageCountFor?.file === countFile ? pageCountFor.count : null;
   useEffect(() => {
-    if (meta.multiFile || files.length !== 1) {
-      setPageCount(null);
-      return;
-    }
+    if (!countFile) return;
     let cancelled = false;
     void (async () => {
       try {
         const { getPageCount } = await loadPdfTools();
-        const count = await getPageCount(files[0]!);
-        if (!cancelled) setPageCount(count);
+        const count = await getPageCount(countFile);
+        if (!cancelled) setPageCountFor({ file: countFile, count });
       } catch {
-        if (!cancelled) setPageCount(null);
+        if (!cancelled) setPageCountFor(null);
       }
     })();
     return () => {
       cancelled = true;
     };
-  }, [files, meta.multiFile]);
+  }, [countFile]);
 
   const addFiles = useCallback(
     (list: FileList | File[]) => {
@@ -455,7 +458,7 @@ function OpFields({
           <input
             id="ptSplit"
             type="text"
-            placeholder='e.g. "1-3;4-6;7" — leave blank for one PDF per page'
+            placeholder='e.g. "1-3;4-6;7", or leave blank for one PDF per page'
             value={params.splitGroups}
             onChange={(e) => set({ splitGroups: e.target.value })}
           />

@@ -20,7 +20,7 @@ export type JobResult = Pick<
 
 /**
  * Run one queue item through the engine for the active tool. Pure bridge between
- * the browser canvas and the framework-agnostic engine — faithful to the
+ * the browser canvas and the framework-agnostic engine, faithful to the
  * reference's `processItem`. Throws on failure (caller records the message).
  */
 export async function runJob(
@@ -100,7 +100,7 @@ export async function runJob(
     });
     if (!meta.applied && !refined) {
       // Nothing was removed by either the catalog engine or the corner
-      // refinement — surface a clear message instead of a silent no-op copy.
+      // refinement, so surface a clear message instead of a silent no-op copy.
       throw new Error(
         meta.skipReason
           ? `No Gemini watermark removed (${meta.skipReason})`

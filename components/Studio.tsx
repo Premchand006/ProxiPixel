@@ -26,7 +26,7 @@ function Header() {
         </div>
       </div>
       <div className="privacy">
-        <span className="dot" /> 100% local · no uploads
+        <span className="dot" /> Runs locally · no uploads
       </div>
     </header>
   );
@@ -37,13 +37,13 @@ function Notes() {
     <div className="notes">
       <div className="note">
         <b>4K upscaling.</b> Defaults to 4K UHD (3840px long edge): gamma-correct
-        Lanczos in linear light, then a thresholded Gaussian sharpen — crisp and
-        halo-free. Enlarges existing detail; doesn’t invent it.
+        Lanczos in linear light, then a thresholded Gaussian sharpen for crisp edges
+        without halos. Enlarges existing detail; doesn’t invent it.
       </div>
       <div className="note">
         <b>Watermark removal.</b> Strips Gemini’s bottom-right logo with exact
-        reverse alpha blending — lossless on known sizes, with a corner re-fit
-        for odd dimensions. That visible mark only.
+        reverse alpha blending. Lossless on known sizes, with a corner re-fit
+        for odd dimensions. Only that visible mark is removed.
       </div>
       <div className="note">
         <b>Video.</b> Convert, trim, crop and mute (MP4 / WebM / GIF) via
@@ -51,13 +51,13 @@ function Notes() {
       </div>
       <div className="note">
         <b>Documents.</b> Convert DOCX · ODT · RTF · PDF · MD · HTML · TXT and
-        XLSX · CSV · ODS both ways (PPTX import). PDF is text-only — no
-        layout, images, or fonts survive the round trip. 100% in your browser
-        — nothing is uploaded.
+        XLSX · CSV · ODS both ways (PPTX import). PDF is text-only:
+        layout, images and fonts don’t survive the round trip. Everything runs
+        in your browser and nothing is uploaded.
       </div>
       <div className="note">
         <b>Metadata stripped.</b> Every image export is decoded and re-encoded
-        locally, so EXIF — GPS, camera, timestamps — is removed. Cards flag
+        locally, so EXIF data (GPS, camera, timestamps) is removed. Cards flag
         source location data.
       </div>
     </div>
@@ -84,8 +84,8 @@ function StudioLayout() {
       )}
       <Notes />
       <footer>
-        ProxiPixel · Local-first &amp; secure · Zero-latency · Images · Watermarks ·
-        Videos · Documents · PDF Tools
+        ProxiPixel · Image, video, document and PDF tools that run in your
+        browser
       </footer>
       <CompareModal />
       <VideoModal />
