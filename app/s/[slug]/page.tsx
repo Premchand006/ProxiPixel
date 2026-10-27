@@ -30,7 +30,7 @@ async function resolveShare(slug: string): Promise<Resolved> {
     const job = await selectJobByIdAny(db, share.jobId);
     if (!job?.outputPath) return { url: null, reason: "unavailable" };
 
-    // No session here — sign with the service role (server-only). Cap the URL
+    // No session here, so sign with the service role (server-only). Cap the URL
     // lifetime to whatever is left of the share so it can't outlive expiry.
     const ttl = Math.max(
       60,

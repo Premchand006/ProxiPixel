@@ -38,7 +38,7 @@ describe("rateLimit", () => {
 
 describe("allow", () => {
   // No UPSTASH_REDIS_REST_URL/TOKEN in the test env, so this exercises the
-  // in-memory fallback path — same one a local dev or single-instance deploy
+  // in-memory fallback path, the same one a local dev or single-instance deploy
   // without Upstash configured actually runs.
   it("enforces the limit and blocks over it, keyed independently", async () => {
     const key = `test:${Math.random()}`;

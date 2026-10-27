@@ -11,7 +11,7 @@ export async function register(): Promise<void> {
     try {
       await import("./sentry.edge.config");
     } catch (err) {
-      console.error("Sentry edge module failed to load — continuing without it", err);
+      console.error("Sentry edge module failed to load, continuing without it", err);
     }
   }
 }

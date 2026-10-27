@@ -44,7 +44,7 @@ export const FORMATS: Record<DocFormat, FormatInfo> = {
     bestEffort: true,
   },
   // Best-effort like odt: text/structure only, extracted from (or laid out
-  // into) pages via pdfjs-dist / jsPDF — no layout, images, or font fidelity.
+  // into) pages via pdfjs-dist / jsPDF, with no layout, image or font fidelity.
   pdf: {
     ext: "pdf",
     label: "PDF",
@@ -54,7 +54,7 @@ export const FORMATS: Record<DocFormat, FormatInfo> = {
     bestEffort: true,
   },
   // PPTX import extracts slide text; export (generating a presentation from
-  // prose) is intentionally not offered — it needs a heavy, node-coupled
+  // prose) is intentionally not offered: it needs a heavy, node-coupled
   // library and produces low-value output.
   pptx: {
     ext: "pptx",
@@ -64,8 +64,8 @@ export const FORMATS: Record<DocFormat, FormatInfo> = {
     canWrite: false,
     bestEffort: true,
   },
-  // Legacy binary PowerPoint — not convertible client-side.
-  ppt: { ext: "ppt", label: "PowerPoint 97–2003 (PPT)", family: "doc", canRead: false, canWrite: false },
+  // Legacy binary PowerPoint, not convertible client-side.
+  ppt: { ext: "ppt", label: "PowerPoint 97-2003 (PPT)", family: "doc", canRead: false, canWrite: false },
   csv: { ext: "csv", label: "CSV", family: "sheet", canRead: true, canWrite: true },
   xlsx: { ext: "xlsx", label: "Excel (XLSX)", family: "sheet", canRead: true, canWrite: true },
   ods: { ext: "ods", label: "OpenDocument Sheet (ODS)", family: "sheet", canRead: true, canWrite: true },

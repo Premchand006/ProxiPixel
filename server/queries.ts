@@ -59,7 +59,7 @@ export function selectPresetsForUser(
     .orderBy(desc(presets.createdAt));
 }
 
-/** Delete scoped to the owner — the `userId` predicate is the guard. */
+/** Delete scoped to the owner; the `userId` predicate is the guard. */
 export async function deletePresetForUser(
   db: Db,
   id: string,
@@ -87,7 +87,7 @@ export async function selectJobById(
   return row;
 }
 
-/** Unscoped lookup — server-only, used for resolving public shares. */
+/** Unscoped lookup. Server-only, used for resolving public shares. */
 export async function selectJobByIdAny(
   db: Db,
   id: string,

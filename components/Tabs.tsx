@@ -11,7 +11,7 @@ const TABS: Array<{ mode: Mode; label: string }> = [
   { mode: "watermark", label: "Watermark" },
   { mode: "video", label: "Video" },
   { mode: "documents", label: "Documents" },
-  { mode: "pdftools", label: "PDF Tools" },
+  { mode: "pdftools", label: "PDF tools" },
 ];
 
 export function Tabs() {

@@ -154,7 +154,7 @@ export function UpscalePanel() {
           : ""}
         Pipeline: denoise → gamma-correct Lanczos → clarity → Gaussian sharpen,
         all local. Resampling in linear light keeps edges crisp; thresholded
-        sharpening adds detail without halos or amplified noise. 4K + large
+        sharpening avoids halos and amplified noise. 4K + large
         images take a moment.
       </div>
     </>

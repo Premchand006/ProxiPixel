@@ -6,16 +6,16 @@ import type { ImageFormat } from "@/lib/engine/types";
 import { RunButton } from "@/components/RunButton";
 
 const WARN: Partial<Record<ImageFormat, string>> = {
-  gif: "GIF caps at 256 colours — best for graphics, not photos.",
+  gif: "GIF is limited to 256 colours, so it suits graphics better than photos.",
   tiff: "TIFF here is uncompressed (large files, lossless).",
   pdf: "Each image becomes a one-page PDF sized to fit.",
   bmp: "BMP is uncompressed 24-bit.",
 };
 
 // Pixel re-encodes images to pixel formats, plus PDF as a one-page wrap
-// around the image (lib/engine/pdf.ts) — grouped separately since it isn't
-// a pixel format. Document round-tripping — DOCX/MD/HTML/XLSX, PDF included
-// — lives in the Documents tab.
+// around the image (lib/engine/pdf.ts), grouped separately since it isn't
+// a pixel format. Document round-tripping (DOCX/MD/HTML/XLSX, PDF included)
+// lives in the Documents tab.
 const DOCUMENT_FORMATS: ReadonlySet<ImageFormat> = new Set(["pdf"]);
 const IMAGE_GROUP = OUT_CONVERT.filter(([v]) => !DOCUMENT_FORMATS.has(v));
 const DOCUMENT_GROUP = OUT_CONVERT.filter(([v]) => DOCUMENT_FORMATS.has(v));
@@ -28,7 +28,7 @@ export function ConvertPanel() {
     fmt === "avif"
       ? avifOK
         ? "AVIF: best compression, modern browsers."
-        : "Your browser can’t encode AVIF — try Chrome or Edge."
+        : "Your browser can’t encode AVIF. Try Chrome or Edge."
       : (WARN[fmt] ?? "");
 
   return (

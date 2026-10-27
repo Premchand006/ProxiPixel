@@ -1,7 +1,7 @@
 import { test, expect, type Page } from "@playwright/test";
 import { readFile } from "node:fs/promises";
 
-// Verifies the Documents tab end-to-end in a real browser — exercising the
+// Verifies the Documents tab end-to-end in a real browser, exercising the
 // binary readers (docx via mammoth, odt via the custom parser) that jsdom/vitest
 // can't run because of File/Blob realm quirks.
 

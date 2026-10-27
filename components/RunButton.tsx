@@ -5,7 +5,7 @@ import type { Mode } from "@/lib/app/types";
 
 const LABELS: Record<Mode, string> = {
   convert: "Convert all",
-  upscale: "Enhance all",
+  upscale: "Upscale all",
   optimize: "Optimize all",
   watermark: "Remove watermarks",
   video: "Process video",

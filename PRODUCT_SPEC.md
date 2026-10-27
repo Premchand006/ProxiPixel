@@ -1,16 +1,16 @@
-# ProxiPixel — Product Spec
+# ProxiPixel Product Spec
 
 ## Summary
-A privacy-first media toolkit that runs processing in the browser, with a thin backend
+A media toolkit that processes files in the browser, with a thin backend
 for accounts, history, presets, and shareable results. Deployed on Vercel (Netlify also
 supported). Reference implementation: `reference/legacy-index.html` (faithfully port it).
 
 ## Users & value
 - Anyone who needs to convert/compress/upscale images or convert/trim/crop video.
-- Value: fast, free, private (files never leave the device unless the user explicitly
-  saves a result), no install.
+- Value: it is free, needs no install, and files stay on the device unless the user
+  explicitly saves a result.
 
-## Core features (client-side engine — already working in the reference)
+## Core features (client-side engine, already working in the reference)
 1. **Convert** images between PNG, JPEG, WebP, AVIF, BMP, GIF, TIFF, PDF (and PDF→image).
 2. **Upscale / clarity**: scale presets + custom width; Lanczos or smooth resampling;
    denoise, clarity (local contrast), sharpen amount + radius.
@@ -32,12 +32,12 @@ supported). Reference implementation: `reference/legacy-index.html` (faithfully 
 - **Account page**: list history, presets, saved outputs; delete items; sign out.
 
 ## Pages / routes
-- `/` — the tool (4 tabs). Works fully when signed out (processing is local). Signed-in
+- `/`: the tool (4 tabs). Works fully when signed out (processing is local). Signed-in
   users get "Save" and "Add to history" affordances.
-- `/login` — auth.
-- `/library` — saved outputs + history (auth required).
-- `/presets` — manage presets (auth required).
-- `/s/[slug]` — public share view of a saved output (optional).
+- `/login`: auth.
+- `/library`: saved outputs + history (auth required).
+- `/presets`: manage presets (auth required).
+- `/s/[slug]`: public share view of a saved output (optional).
 
 ## Data model (see db/schema.ts)
 - `profiles(id→auth.users, display_name, plan, created_at)`

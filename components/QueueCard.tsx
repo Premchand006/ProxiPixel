@@ -46,7 +46,7 @@ function Badge({ it }: { it: QueueItem }) {
 export function QueueCard({ it }: { it: QueueItem }) {
   const { removeItem, openCompare, openVideo, saveOutput } = useStudio();
   const isVid = it.kind === "video";
-  const dims = it.w ? `${it.w}×${it.h}` : "—";
+  const dims = it.w ? `${it.w}×${it.h}` : "-";
   const canPreview =
     isVid &&
     !!it.resultName &&
@@ -56,7 +56,7 @@ export function QueueCard({ it }: { it: QueueItem }) {
     <div className="card">
       <div className="thumb">
         {it.thumb ? (
-          // Dynamic data/object URLs — next/image isn't applicable here.
+          // Dynamic data/object URLs, so next/image isn't applicable here.
           // eslint-disable-next-line @next/next/no-img-element
           <img src={it.thumb} alt="" />
         ) : (

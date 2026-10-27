@@ -28,13 +28,13 @@ export interface UpscaleOptions {
   /** Requested output width in px; height follows the source aspect ratio. */
   targetW: number;
   method: ResampleMethod;
-  /** 0..1 — edge-preserving-ish smooth blend. */
+  /** 0..1, edge-preserving-ish smooth blend. */
   denoise: number;
-  /** 0..1 — local-contrast (large-radius unsharp). */
+  /** 0..1, local-contrast (large-radius unsharp). */
   clarity: number;
-  /** ~0..1.5 — unsharp mask amount. */
+  /** ~0..1.5, unsharp mask amount. */
   sharpen: number;
-  /** px — unsharp/blur radius. */
+  /** px, unsharp/blur radius. */
   radius: number;
 }
 

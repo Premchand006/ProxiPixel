@@ -46,7 +46,7 @@ export function Queue() {
         </div>
       ) : (
         <div id="emptyState" className="empty">
-          No images yet — add some above to get started.
+          No images yet. Add some above to get started.
         </div>
       )}
     </>

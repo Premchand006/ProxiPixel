@@ -56,8 +56,9 @@ describe("removeWatermark", () => {
 
   /**
    * A dark image (non-standard size) with a bright, semi-transparent sparkle
-   * stamped near the bottom-right corner — the case reverse-alpha-blending leaves
-   * as a gray box with a ghost, and the content-aware reconstruction repairs.
+   * stamped near the bottom-right corner. This is the case reverse-alpha-blending
+   * leaves as a gray box with a ghost and the content-aware reconstruction
+   * repairs.
    */
   function darkWithCornerStamp(w: number, h: number): RawImage {
     const data = new Uint8ClampedArray(w * h * 4);

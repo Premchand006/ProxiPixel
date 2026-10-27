@@ -25,7 +25,6 @@ export function VideoModal() {
       <button className="x" aria-label="Close preview" onClick={closeVideo}>
         ×
       </button>
-      {/* eslint-disable-next-line jsx-a11y/media-has-caption -- user-generated output, no captions available */}
       <video id="vmVideo" src={videoItem.result} controls playsInline autoPlay />
     </div>
   );

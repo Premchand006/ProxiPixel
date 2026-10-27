@@ -1,9 +1,9 @@
--- db/auth-setup.sql — Phase 3 auth bootstrap.
+-- db/auth-setup.sql: Phase 3 auth bootstrap.
 --
 -- Run this in the Supabase SQL editor for a fresh project so sign-in works
 -- before the full Phase 4 Drizzle migration. It creates ONLY the profiles
 -- table; the signup trigger and RLS already live in db/policies.sql (apply
--- that too). Idempotent and consistent with db/schema.ts — superseded by the
+-- that too). Idempotent and consistent with db/schema.ts, and superseded by the
 -- Phase 4 migration, which manages all tables.
 
 create table if not exists public.profiles (
