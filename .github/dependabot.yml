@@ -10,6 +10,11 @@ updates:
       # batch it into one PR a week instead of one per package.
       dev-tooling:
         dependency-type: development
+    ignore:
+      # typescript-eslint (via eslint-config-next) supports TypeScript <6.1
+      # only, and TS 7 has no stable JS API yet. Drop this once it does.
+      - dependency-name: typescript
+        update-types: ["version-update:semver-major"]
 
   - package-ecosystem: github-actions
     directory: /

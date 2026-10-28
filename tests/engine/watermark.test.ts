@@ -10,7 +10,9 @@ import type { RawImage } from "@/lib/engine/types";
  * pixels, preserves the image shape, and reports `applied: false` when there is
  * no watermark to remove (a flat image at a known Gemini size).
  */
-describe("removeWatermark", () => {
+// Each case runs the full engine over a ~1MP image, which can exceed Vitest's
+// 5s default on slower machines.
+describe("removeWatermark", { timeout: 30_000 }, () => {
   function flatImage(w: number, h: number, v = 128): RawImage {
     const data = new Uint8ClampedArray(w * h * 4);
     for (let i = 0; i < data.length; i += 4) {
