@@ -1,7 +1,7 @@
 // Edge runtime (middleware) Sentry init. No-op when NEXT_PUBLIC_SENTRY_DSN
 // isn't set (see sentry.client.config.ts).
 //
-// This file runs on every request (middleware.ts has a near-universal
+// This file runs on every request (proxy.ts has a near-universal
 // matcher), so on deploy targets whose "edge" isn't Vercel's (e.g. Netlify's
 // middleware runs as a Deno-based Edge Function, not Node.js), an
 // incompatibility inside Sentry.init() would take the whole site down. The
