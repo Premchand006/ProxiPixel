@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Space_Grotesk, Inter, JetBrains_Mono } from "next/font/google";
 import { SiteHeader } from "@/components/SiteHeader";
 import { ToastProvider } from "@/lib/app/toast";
+import { THEME_INIT_SCRIPT } from "@/lib/app/theme";
 import "./globals.css";
 
 const display = Space_Grotesk({
@@ -42,9 +43,13 @@ export default function RootLayout({
       lang="en"
       className={`${display.variable} ${body.variable} ${mono.variable}`}
       // Browser extensions (e.g. QuillBot adds data-qb-installed) mutate <html>
-      // before hydration; tolerate those attribute-only diffs on this element.
+      // before hydration, as does THEME_INIT_SCRIPT (data-theme); tolerate
+      // those attribute-only diffs on this element.
       suppressHydrationWarning
     >
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
+      </head>
       <body>
         <ToastProvider>
           <SiteHeader />
