@@ -51,23 +51,42 @@
  * CSS custom properties (also exposed to Tailwind via tailwind.config.ts).
  * Fonts come from next/font (--ff-display / --ff-body / --ff-mono).
  */
+/*
+ * Themes: every color token is light-dark(<light>, <dark>), resolved by
+ * color-scheme. With no data-theme it follows the OS; data-theme="light" or
+ * "dark" (set by ThemeToggle, applied pre-paint by the script in
+ * app/layout.tsx) pins one. Light accents are darker so they keep 4.5:1
+ * contrast as text on --ink/--surface and under --ink text on buttons.
+ */
 :root {
-  --ink: #0f1117;
-  --surface: #161922;
-  --surface-2: #1e222d;
-  --line: #2a2f3d;
-  --line-soft: #22262f;
-  --text: #eaecf2;
-  --muted: #9aa1b2;
-  --faint: #6b7280;
-  --cyan: #34e0d8;
-  --magenta: #ff5c9e;
-  --amber: #ffc65a;
-  --good: #5be8a6;
-  --bad: #ff7a7a;
+  color-scheme: light dark;
+  --ink: light-dark(#f5f6fa, #0f1117);
+  --surface: light-dark(#ffffff, #161922);
+  --surface-2: light-dark(#eceef3, #1e222d);
+  --line: light-dark(#d4d8e1, #2a2f3d);
+  --line-soft: light-dark(#e5e8ee, #22262f);
+  --line-strong: light-dark(#b6bcc9, #3a4150);
+  --text: light-dark(#151821, #eaecf2);
+  --muted: light-dark(#4f5666, #9aa1b2);
+  --faint: light-dark(#656c7a, #6b7280);
+  --cyan: light-dark(#08736e, #34e0d8);
+  --magenta: light-dark(#c0185a, #ff5c9e);
+  --amber: light-dark(#925600, #ffc65a);
+  --good: light-dark(#137547, #5be8a6);
+  --bad: light-dark(#c22525, #ff7a7a);
+  --check-a: light-dark(#e9ebf0, #1a1d26);
+  --check-b: light-dark(#f6f7fa, #21252f);
+  --code-bg: light-dark(#f1f3f7, #0c0e13);
+  --shadow: light-dark(rgba(16, 24, 40, 0.12), rgba(0, 0, 0, 0.35));
   --display: var(--ff-display), "Space Grotesk", sans-serif;
   --body: var(--ff-body), "Inter", sans-serif;
   --mono: var(--ff-mono), "JetBrains Mono", ui-monospace, monospace;
+}
+:root[data-theme="light"] {
+  color-scheme: light;
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
 }
 
 * {
@@ -84,7 +103,8 @@ body {
   font-family: var(--body);
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
-  background-image: linear-gradient(var(--line-soft) 1px, transparent 1px),
+  background-image:
+    linear-gradient(var(--line-soft) 1px, transparent 1px),
     linear-gradient(90deg, var(--line-soft) 1px, transparent 1px);
   background-size:
     34px 34px,
@@ -150,7 +170,7 @@ header.top {
   height: 7px;
   border-radius: 50%;
   background: var(--good);
-  box-shadow: 0 0 0 3px rgba(91, 232, 166, 0.16);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--good) 16%, transparent);
 }
 
 /* ---------- tabs ---------- */
@@ -201,7 +221,11 @@ header.top {
   border: 1.5px dashed var(--line);
   border-radius: 18px;
   background:
-    linear-gradient(180deg, rgba(52, 224, 216, 0.04), rgba(255, 92, 158, 0.03)),
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--cyan) 4%, transparent),
+      color-mix(in srgb, var(--magenta) 3%, transparent)
+    ),
     var(--surface);
   padding: 46px 24px;
   text-align: center;
@@ -210,12 +234,16 @@ header.top {
   overflow: hidden;
 }
 .drop:hover {
-  border-color: #3a4150;
+  border-color: var(--line-strong);
 }
 .drop.over {
   border-color: var(--cyan);
   background:
-    linear-gradient(180deg, rgba(52, 224, 216, 0.1), rgba(255, 92, 158, 0.06)),
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--cyan) 10%, transparent),
+      color-mix(in srgb, var(--magenta) 6%, transparent)
+    ),
     var(--surface);
 }
 .drop:focus-visible {
@@ -422,7 +450,7 @@ input[type="range"] {
   filter: none;
 }
 .run:focus-visible {
-  outline: 2px solid #fff;
+  outline: 2px solid var(--text);
   outline-offset: 2px;
 }
 
@@ -460,7 +488,7 @@ input[type="range"] {
 }
 .ghost:hover {
   color: var(--text);
-  border-color: #3a4150;
+  border-color: var(--line-strong);
 }
 .ghost:disabled {
   opacity: 0.4;
@@ -468,7 +496,7 @@ input[type="range"] {
 }
 .ghost.accent {
   color: var(--cyan);
-  border-color: rgba(52, 224, 216, 0.4);
+  border-color: color-mix(in srgb, var(--cyan) 40%, transparent);
 }
 
 .grid {
@@ -486,8 +514,11 @@ input[type="range"] {
 }
 .thumb {
   height: 138px;
-  background: repeating-conic-gradient(#1a1d26 0 25%, #21252f 0 50%) 0 0 / 18px
-    18px;
+  background: repeating-conic-gradient(
+      var(--check-a) 0 25%,
+      var(--check-b) 0 50%
+    )
+    0 0 / 18px 18px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -658,16 +689,16 @@ input[type="range"] {
   line-height: 1.5;
 }
 .notes .note:nth-child(1) {
-  border-color: #314036;
+  border-color: color-mix(in srgb, var(--good) 22%, var(--line));
 }
 .notes .note:nth-child(2) {
-  border-color: #403140;
+  border-color: color-mix(in srgb, var(--magenta) 22%, var(--line));
 }
 .notes .note:nth-child(3) {
-  border-color: #3a3140;
+  border-color: color-mix(in srgb, var(--magenta) 14%, var(--line));
 }
 .notes .note:nth-child(4) {
-  border-color: #2f3a40;
+  border-color: color-mix(in srgb, var(--cyan) 18%, var(--line));
 }
 .note b {
   color: var(--text);
@@ -700,11 +731,11 @@ footer {
 }
 .badge.gps {
   color: var(--amber);
-  border-color: rgba(255, 198, 90, 0.4);
+  border-color: color-mix(in srgb, var(--amber) 40%, transparent);
 }
 .badge.clean {
   color: var(--good);
-  border-color: rgba(91, 232, 166, 0.35);
+  border-color: color-mix(in srgb, var(--good) 35%, transparent);
 }
 .cmpbtn {
   appearance: none;
@@ -719,7 +750,7 @@ footer {
 }
 .cmpbtn:hover {
   color: var(--cyan);
-  border-color: rgba(52, 224, 216, 0.4);
+  border-color: color-mix(in srgb, var(--cyan) 40%, transparent);
 }
 
 /* compare overlay */
@@ -772,8 +803,11 @@ footer {
   border: 1px solid var(--line);
   border-radius: 12px;
   overflow: hidden;
-  background: repeating-conic-gradient(#1a1d26 0 25%, #21252f 0 50%) 0 0 / 22px
-    22px;
+  background: repeating-conic-gradient(
+      var(--check-a) 0 25%,
+      var(--check-b) 0 50%
+    )
+    0 0 / 22px 22px;
   -webkit-user-select: none;
   user-select: none;
   touch-action: none;
@@ -847,7 +881,7 @@ footer {
 .vlog {
   flex-basis: 100%;
   margin-top: 4px;
-  background: #0c0e13;
+  background: var(--code-bg);
   border: 1px solid var(--line);
   border-radius: 9px;
   padding: 10px 12px;
@@ -988,6 +1022,15 @@ footer {
 }
 .navcta {
   color: var(--cyan);
+}
+/* ThemeToggle: show only the label for the active theme (see the component). */
+.themeopt {
+  display: none;
+}
+:root:not([data-theme]) .themeopt[data-opt="system"],
+:root[data-theme="light"] .themeopt[data-opt="light"],
+:root[data-theme="dark"] .themeopt[data-opt="dark"] {
+  display: inline;
 }
 .navauth {
   display: inline-flex;
@@ -1220,8 +1263,11 @@ footer {
   object-fit: contain;
   border: 1px solid var(--line);
   border-radius: 10px;
-  background: repeating-conic-gradient(#1a1d26 0 25%, #21252f 0 50%) 0 0 / 18px
-    18px;
+  background: repeating-conic-gradient(
+      var(--check-a) 0 25%,
+      var(--check-b) 0 50%
+    )
+    0 0 / 18px 18px;
 }
 .sharedl {
   text-align: center;
@@ -1249,7 +1295,7 @@ footer {
   background: var(--surface-2);
   color: var(--text);
   font-size: 13px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+  box-shadow: 0 8px 24px var(--shadow);
   animation: toastin 0.16s ease-out;
 }
 @keyframes toastin {
@@ -1259,10 +1305,10 @@ footer {
   }
 }
 .toast-success {
-  border-color: rgba(91, 232, 166, 0.45);
+  border-color: color-mix(in srgb, var(--good) 45%, transparent);
 }
 .toast-error {
-  border-color: rgba(255, 122, 122, 0.5);
+  border-color: color-mix(in srgb, var(--bad) 50%, transparent);
 }
 .toast span {
   flex: 1;

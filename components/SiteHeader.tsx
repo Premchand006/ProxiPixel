@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { AuthNav } from "./auth/AuthNav";
+import { ThemeToggle } from "./ThemeToggle";
 
 /**
  * Slim global nav rendered above every page. Brand + protected-area links +
@@ -21,6 +22,7 @@ export function SiteHeader() {
       <Link href="/presets" className="navlink">
         Presets
       </Link>
+      <ThemeToggle />
       <AuthNav />
     </nav>
   );

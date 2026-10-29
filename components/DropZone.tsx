@@ -68,13 +68,19 @@ export function DropZone() {
         ))}
         <span
           className="fmt"
-          style={{ color: "var(--magenta)", borderColor: "rgba(255,92,158,.4)" }}
+          style={{
+            color: "var(--magenta)",
+            borderColor: "color-mix(in srgb, var(--magenta) 40%, transparent)",
+          }}
         >
           MP4 / MOV / WEBM
         </span>
         <span
           className="fmt"
-          style={{ color: "var(--cyan)", borderColor: "rgba(52,224,216,.4)" }}
+          style={{
+            color: "var(--cyan)",
+            borderColor: "color-mix(in srgb, var(--cyan) 40%, transparent)",
+          }}
         >
           images + video
         </span>
