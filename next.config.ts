@@ -5,7 +5,8 @@ import { withSentryConfig } from "@sentry/nextjs";
 // ever talks to at runtime. Every media library (FFmpeg.wasm, pdf.js, gifenc,
 // utif, jspdf) is vendored same-origin (see lib/engine/loaders.ts and
 // tools/vendor-assets.mjs), so nothing fetches code from a third-party CDN.
-const SUPABASE_ORIGINS = "https://*.supabase.co https://*.supabase.in wss://*.supabase.co";
+const SUPABASE_ORIGINS =
+  "https://*.supabase.co https://*.supabase.in wss://*.supabase.co";
 
 // Only allowlisted when actually configured, derived from the real DSN
 // (not a wildcarded guess) so CSP stays tight when Sentry isn't set up.
@@ -46,6 +47,8 @@ const securityHeaders = [
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
+  // Don't let `next dev` write an AGENTS.md into the repo.
+  agentRules: false,
   // Keep the Postgres driver out of the bundle; load it as a native node module
   // in server actions / RSC.
   serverExternalPackages: ["postgres"],
@@ -55,7 +58,16 @@ const nextConfig: NextConfig = {
   webpack: (config, { isServer }) => {
     if (!isServer) {
       const empty: Record<string, false> = {};
-      for (const m of ["fs", "https", "http", "zlib", "stream", "url", "crypto", "path"]) {
+      for (const m of [
+        "fs",
+        "https",
+        "http",
+        "zlib",
+        "stream",
+        "url",
+        "crypto",
+        "path",
+      ]) {
         empty[m] = false;
         empty[`node:${m}`] = false;
       }
@@ -85,7 +97,10 @@ const nextConfig: NextConfig = {
         // to expire within a bounded window, not be pinned forever.
         source: "/vendor/:path*",
         headers: [
-          { key: "Cache-Control", value: "public, max-age=604800, must-revalidate" },
+          {
+            key: "Cache-Control",
+            value: "public, max-age=604800, must-revalidate",
+          },
         ],
       },
     ];
