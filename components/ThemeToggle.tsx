@@ -1,41 +1,51 @@
 "use client";
 
-import { THEMES, THEME_STORAGE_KEY, type Theme } from "@/lib/app/theme";
-
-const LABELS: Record<Theme, string> = {
-  system: "Theme: System",
-  light: "Theme: Light",
-  dark: "Theme: Dark",
-};
+import { THEME_STORAGE_KEY, type Theme } from "@/lib/app/theme";
 
 /**
- * Cycles System -> Light -> Dark. The current theme lives on <html data-theme>
- * (set pre-paint by THEME_INIT_SCRIPT), not in React state, and CSS shows the
- * matching label, so server and client render identical markup and the label
- * never flickers on load.
+ * Sun/moon button that flips between light and dark. The active theme lives on
+ * <html data-theme> (set pre-paint by THEME_INIT_SCRIPT) or, before the first
+ * toggle, comes from the OS. CSS picks the icon (sun while dark, moon while
+ * light), so server and client render identical markup and nothing flickers.
  */
 export function ThemeToggle() {
-  function cycle(): void {
+  function toggle(): void {
     const root = document.documentElement;
-    const current = (root.dataset.theme as Theme | undefined) ?? "system";
-    const next = THEMES[(THEMES.indexOf(current) + 1) % THEMES.length];
+    const current: Theme =
+      (root.dataset.theme as Theme | undefined) ??
+      (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+    const next: Theme = current === "dark" ? "light" : "dark";
+    root.dataset.theme = next;
     try {
-      if (next === "system") localStorage.removeItem(THEME_STORAGE_KEY);
-      else localStorage.setItem(THEME_STORAGE_KEY, next);
+      localStorage.setItem(THEME_STORAGE_KEY, next);
     } catch {
       // Storage blocked (private mode etc.): the switch still applies for this page.
     }
-    if (next === "system") delete root.dataset.theme;
-    else root.dataset.theme = next;
   }
 
   return (
-    <button type="button" className="navlink themetoggle" onClick={cycle}>
-      {THEMES.map((t) => (
-        <span key={t} className="themeopt" data-opt={t}>
-          {LABELS[t]}
-        </span>
-      ))}
+    <button
+      type="button"
+      className="themetoggle"
+      onClick={toggle}
+      aria-label="Toggle light and dark theme"
+      title="Toggle light and dark theme"
+    >
+      <svg
+        className="themeicon themeicon-sun"
+        viewBox="0 0 24 24"
+        aria-hidden="true"
+      >
+        <circle cx="12" cy="12" r="4.5" />
+        <path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8" />
+      </svg>
+      <svg
+        className="themeicon themeicon-moon"
+        viewBox="0 0 24 24"
+        aria-hidden="true"
+      >
+        <path d="M20.5 14.5A8.5 8.5 0 0 1 9.5 3.5a8.5 8.5 0 1 0 11 11z" />
+      </svg>
     </button>
   );
 }

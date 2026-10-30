@@ -1023,14 +1023,52 @@ footer {
 .navcta {
   color: var(--cyan);
 }
-/* ThemeToggle: show only the label for the active theme (see the component). */
-.themeopt {
-  display: none;
+/* ThemeToggle: sun while dark (switches to light), moon while light. */
+.themetoggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--muted);
+  cursor: pointer;
+  transition: 0.15s;
 }
-:root:not([data-theme]) .themeopt[data-opt="system"],
-:root[data-theme="light"] .themeopt[data-opt="light"],
-:root[data-theme="dark"] .themeopt[data-opt="dark"] {
-  display: inline;
+.themetoggle:hover {
+  color: var(--amber);
+  border-color: var(--line-strong);
+}
+.themetoggle:focus-visible {
+  outline: 2px solid var(--cyan);
+  outline-offset: 2px;
+}
+.themeicon {
+  display: none;
+  width: 17px;
+  height: 17px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+:root[data-theme="dark"] .themeicon-sun,
+:root[data-theme="light"] .themeicon-moon {
+  display: block;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) .themeicon-sun {
+    display: block;
+  }
+}
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme]) .themeicon-moon {
+    display: block;
+  }
 }
 .navauth {
   display: inline-flex;

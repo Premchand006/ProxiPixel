@@ -11,9 +11,15 @@ import { ThemeToggle } from "./ThemeToggle";
 export function SiteHeader() {
   return (
     <nav className="sitenav" aria-label="Primary">
-      <Link href="/" className="navbrand">
-        <Image src="/logo.png" alt="" width={28} height={28} className="navlogo" priority />
-        PROXIPIXEL
+      <Link href="/" className="navbrand" aria-label="ProxiPixel home">
+        <Image
+          src="/logo.png"
+          alt=""
+          width={32}
+          height={32}
+          className="navlogo"
+          priority
+        />
       </Link>
       <div className="navspacer" />
       <Link href="/library" className="navlink">
@@ -22,8 +28,8 @@ export function SiteHeader() {
       <Link href="/presets" className="navlink">
         Presets
       </Link>
-      <ThemeToggle />
       <AuthNav />
+      <ThemeToggle />
     </nav>
   );
 }

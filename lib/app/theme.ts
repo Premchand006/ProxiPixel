@@ -1,12 +1,11 @@
 /**
- * Color theme preference. "system" is the absence of a stored value: <html>
- * gets no data-theme and globals.css follows prefers-color-scheme. "light" or
+ * Color theme preference. With nothing stored, <html> gets no data-theme and
+ * globals.css follows prefers-color-scheme. Once the user toggles, "light" or
  * "dark" is stored and pinned via <html data-theme>.
  */
 export const THEME_STORAGE_KEY = "theme";
 
-export const THEMES = ["system", "light", "dark"] as const;
-export type Theme = (typeof THEMES)[number];
+export type Theme = "light" | "dark";
 
 /**
  * Runs in <head> before first paint (app/layout.tsx) so a stored theme never
