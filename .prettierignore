@@ -1,0 +1,13 @@
+node_modules
+.next
+out
+build
+coverage
+playwright-report
+test-results
+pnpm-lock.yaml
+reference
+index.html
+db/policies.sql
+lib/engine/watermark/vendor
+watermark-remover
