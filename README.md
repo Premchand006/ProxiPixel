@@ -14,10 +14,10 @@ all without your files ever leaving your device.
 [![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4-38BDF8?logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
 [![Supabase](https://img.shields.io/badge/Supabase-Auth_·_Postgres_·_Storage-3FCF8E?logo=supabase&logoColor=white)](https://supabase.com/)
-[![Tests](https://img.shields.io/badge/tests-86_unit_·_38_e2e-success)](#quality)
+[![Tests](https://img.shields.io/badge/tests-138_unit_·_44_e2e-success)](#quality)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](./LICENSE)
 
-[Features](#features) · [Architecture](#architecture) · [Getting started](#getting-started) · [Deployment](#deployment) · [Security](#security--privacy) · [Contributing](#contributing)
+[Features](#features) · [Architecture](#architecture) · [SEO](#seo--discoverability) · [Getting started](#getting-started) · [Deployment](#deployment) · [Security](#security--privacy) · [Contributing](#contributing)
 
 </div>
 
@@ -38,17 +38,17 @@ TypeScript engines.
 
 ## Features
 
-Seven tools in one workspace:
+Seven tools in one workspace, each with its own landing page:
 
 | Tool | Capability | Formats |
 | :--- | :--- | :--- |
-| **Convert** | Re-encode between image formats, including PDF ⇄ image | PNG · JPG · WebP · AVIF · BMP · GIF · TIFF · PDF · HEIC (input) |
-| **Upscale** | Enlarge up to 4K UHD with gamma-correct Lanczos resampling, linear-light denoise, noise-gated clarity and thresholded sharpening | Any image, up to 3840 px on the long edge |
-| **Optimize** | Compress to a target quality, or to a target file size found by binary search | AVIF · WebP · JPG, with an optional width cap |
-| **Watermark** | Remove Gemini's visible logo by solving the alpha-blend equation, with no generative fill | PNG · JPG · WebP |
-| **Video** | Transcode, trim, crop to an aspect ratio, change frame rate and mute, using FFmpeg.wasm | MP4 (H.264) · WebM (VP9) · GIF |
-| **Documents** | Two-way conversion of documents and spreadsheets, bridged through tables | DOCX · ODT · RTF · PDF · MD · HTML · TXT · XLSX · CSV · ODS · PPTX (input) |
-| **PDF tools** | Merge, split, remove, extract, reorder, rotate, crop margins and add page numbers | PDF |
+| **Convert** (`/`) | Re-encode between image formats, including PDF ⇄ image | PNG · JPG · WebP · AVIF · BMP · GIF · TIFF · PDF · HEIC (input) |
+| **Upscale** (`/image-upscaler`) | Enlarge up to 4K UHD with gamma-correct Lanczos resampling, linear-light denoise, noise-gated clarity and thresholded sharpening | Any image, up to 3840 px on the long edge |
+| **Optimize** (`/image-compressor`) | Compress to a target quality, or to a target file size found by binary search | AVIF · WebP · JPG, with an optional width cap |
+| **Watermark** (`/gemini-watermark-remover`) | Remove Gemini's visible logo by solving the alpha-blend equation, with no generative fill | PNG · JPG · WebP |
+| **Video** (`/video-converter`) | Transcode, trim, crop to an aspect ratio, change frame rate and mute, using FFmpeg.wasm | MP4 (H.264) · WebM (VP9) · GIF |
+| **Documents** (`/document-converter`) | Two-way conversion of documents and spreadsheets, bridged through tables | DOCX · ODT · RTF · PDF · MD · HTML · TXT · XLSX · CSV · ODS · PPTX (input) |
+| **PDF tools** (`/pdf-tools`) | Merge, split, remove, extract, reorder, rotate, crop margins and add page numbers | PDF |
 
 **Every tool also includes:**
 
@@ -167,6 +167,32 @@ flowchart LR
     H1 <-->|table bridge| H2
 ```
 
+## SEO & discoverability
+
+Every tool is a single-page workspace, but each one also has a crawlable,
+statically generated landing page. All of it is driven by one data module,
+[`lib/seo/site.ts`](lib/seo/site.ts), so titles, descriptions, the sitemap,
+structured data, `llms.txt` and the on-page guides can't drift apart.
+
+| Piece | Where | What it does |
+| :--- | :--- | :--- |
+| Tool landing pages | `app/[tool]/page.tsx` | `/image-upscaler`, `/pdf-tools`, …: open the studio on that tool with its own H1, intro and guide |
+| Format pages | `app/convert/[pair]/page.tsx` | 12 curated pairs such as `/convert/heic-to-jpg`, with the output format preselected and pair-specific notes |
+| Tab ⇄ URL sync | `components/Studio.tsx` | Switching tabs updates the URL and `<title>` (via `history.replaceState`), keeping queued files |
+| Metadata | `lib/seo/metadata.ts` | Canonical URL, Open Graph, Twitter card and keywords per page; `noindex` for account and share pages |
+| Structured data | `lib/seo/jsonld.ts` | `WebSite` + `Organization` site-wide, a free `WebApplication` per tool, `BreadcrumbList` on sub-pages |
+| Social cards | `app/**/opengraph-image.tsx` | 1200×630 Open Graph images generated at build time for every page |
+| Crawler files | `app/sitemap.ts`, `app/robots.ts`, `app/llms.txt/route.ts` | Sitemap of every landing page, permissive robots rules, and an [llms.txt](https://llmstxt.org) map for AI assistants |
+| Icons & PWA | `app/favicon.ico`, `app/icon.png`, `app/apple-icon.png`, `app/manifest.ts` | Lightweight icons derived from the logo by `tools/generate-icons.mjs`, plus a web app manifest |
+| Footer links | `components/SiteFooter.tsx` | Plain `<a href>` links to every landing page, since the tool tabs are buttons |
+
+Private routes (`/library`, `/presets`, `/login`, `/s/*`) carry both a `noindex`
+robots meta tag and an `X-Robots-Tag` header. The format pages are deliberately
+a short, hand-written list rather than a generated format × format matrix, and
+`tests/seo/site.test.ts` enforces title and description lengths, uniqueness,
+sitemap coverage and the absence of deprecated FAQ/HowTo markup. Lighthouse CI
+fails the build if the SEO score drops below 95.
+
 ## Tech stack
 
 | Layer | Technology |
@@ -191,12 +217,13 @@ flowchart LR
 │   ├── engine/          Framework-independent media engine (image, video, PDF, watermark)
 │   ├── docs/            Document and spreadsheet conversion hub
 │   ├── app/             Client state, processing dispatch, downloads, theming
+│   ├── seo/             Landing-page copy, metadata, JSON-LD and social-card builders
 │   └── supabase/        Browser, server and admin clients
 ├── server/              Server Actions: jobs, presets, outputs, shares, validation, rate limits
 ├── db/                  Drizzle schema, SQL migrations, RLS and storage policies
 ├── tests/               Vitest unit and integration tests
 ├── e2e/                 Playwright suites and generated sample fixtures
-└── tools/               Build-time asset vendoring
+└── tools/               Build-time asset vendoring and icon generation
 ```
 
 ## Getting started
@@ -229,7 +256,8 @@ pnpm dev                     # → http://localhost:3000
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | for accounts | Public anon key |
 | `SUPABASE_SERVICE_ROLE_KEY` | for accounts | Server-only key. Never expose it to the client. |
 | `DATABASE_URL` / `DIRECT_URL` | for accounts | Pooled runtime connection / direct connection for migrations |
-| `NEXT_PUBLIC_SITE_URL` | yes | Public base URL, used for auth redirects |
+| `NEXT_PUBLIC_SITE_URL` | yes | Public base URL, used for auth redirects, canonical URLs, the sitemap and social cards |
+| `NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION` / `NEXT_PUBLIC_BING_SITE_VERIFICATION` | no | Search Console and Bing Webmaster Tools verification tokens |
 | `UPSTASH_REDIS_REST_URL` / `_TOKEN` | no | Distributed rate limiting. Falls back to an in-memory limiter. |
 | `NEXT_PUBLIC_SENTRY_DSN` | no | Error tracking. Add `SENTRY_ORG`, `SENTRY_PROJECT` and `SENTRY_AUTH_TOKEN` for source maps. |
 
@@ -252,21 +280,23 @@ ProxiPixel deploys as a standard Next.js app.
   request proxy runs as an Edge Function.
 
 Set `NEXT_PUBLIC_SITE_URL` to the production URL, and add it to the Supabase Auth
-redirect allow-list.
+redirect allow-list. It is baked into canonical URLs, the sitemap and Open Graph
+images at build time, so redeploy after changing it. Then submit
+`<your-domain>/sitemap.xml` in Google Search Console and Bing Webmaster Tools.
 
 ## Quality
 
 | Command | What it runs |
 | :--- | :--- |
-| `pnpm test` | 86 Vitest unit tests covering the engines, server actions and document conversions |
-| `pnpm test:e2e` | 38 Playwright tests in real Chromium against real sample files, covering every tool |
+| `pnpm test` | 138 Vitest unit tests covering the engines, server actions, document conversions and SEO invariants |
+| `pnpm test:e2e` | 44 Playwright tests in real Chromium against real sample files, covering every tool and the landing pages |
 | `pnpm verify` | Typecheck → lint → unit tests → production build |
 
 Every push and pull request goes through these continuous integration gates:
 
 - typecheck, lint, unit tests and a production build
 - a production-dependency audit (high or critical findings fail the build)
-- Lighthouse CI with a Core Web Vitals budget
+- Lighthouse CI with a Core Web Vitals budget and a minimum SEO score
 - the full Playwright end-to-end suite
 
 Dependabot opens grouped dependency updates every week.
