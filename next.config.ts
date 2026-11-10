@@ -5,7 +5,8 @@ import { withSentryConfig } from "@sentry/nextjs";
 // ever talks to at runtime. Every media library (FFmpeg.wasm, pdf.js, gifenc,
 // utif, jspdf) is vendored same-origin (see lib/engine/loaders.ts and
 // tools/vendor-assets.mjs), so nothing fetches code from a third-party CDN.
-const SUPABASE_ORIGINS = "https://*.supabase.co https://*.supabase.in wss://*.supabase.co";
+const SUPABASE_ORIGINS =
+  "https://*.supabase.co https://*.supabase.in wss://*.supabase.co";
 
 // Only allowlisted when actually configured, derived from the real DSN
 // (not a wildcarded guess) so CSP stays tight when Sentry isn't set up.
@@ -57,7 +58,16 @@ const nextConfig: NextConfig = {
   webpack: (config, { isServer }) => {
     if (!isServer) {
       const empty: Record<string, false> = {};
-      for (const m of ["fs", "https", "http", "zlib", "stream", "url", "crypto", "path"]) {
+      for (const m of [
+        "fs",
+        "https",
+        "http",
+        "zlib",
+        "stream",
+        "url",
+        "crypto",
+        "path",
+      ]) {
         empty[m] = false;
         empty[`node:${m}`] = false;
       }
@@ -81,13 +91,23 @@ const nextConfig: NextConfig = {
     return [
       { source: "/:path*", headers: securityHeaders },
       {
+        // Belt and braces on top of the pages' own robots meta: private share
+        // links and account pages must never land in a search index, even if
+        // someone posts a link publicly.
+        source: "/:area(s|library|presets|login)/:path*",
+        headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow" }],
+      },
+      {
         // Vendored FFmpeg.wasm assets (see tools/vendor-assets.mjs) have fixed
         // filenames (not content-hashed), so cache for a week rather than
         // Next's usual immutable/1y: a version bump needs old cached copies
         // to expire within a bounded window, not be pinned forever.
         source: "/vendor/:path*",
         headers: [
-          { key: "Cache-Control", value: "public, max-age=604800, must-revalidate" },
+          {
+            key: "Cache-Control",
+            value: "public, max-age=604800, must-revalidate",
+          },
         ],
       },
     ];

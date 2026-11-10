@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
+import { NOINDEX } from "@/lib/seo/metadata";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { listPresets } from "@/server/presets";
 import { PresetList, type PresetItem } from "@/components/presets/PresetList";
 
-export const metadata: Metadata = { title: "Presets · ProxiPixel" };
+export const metadata: Metadata = { title: "Presets", robots: NOINDEX };
 export const dynamic = "force-dynamic";
 
 export default async function PresetsPage() {

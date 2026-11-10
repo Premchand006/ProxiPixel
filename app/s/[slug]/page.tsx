@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { NOINDEX } from "@/lib/seo/metadata";
 import { getDb } from "@/server/db";
 import { selectJobByIdAny, selectShareBySlug } from "@/server/queries";
 import {
@@ -9,7 +10,7 @@ import {
 } from "@/server/output-helpers";
 import { createAdminClient } from "@/lib/supabase/admin";
 
-export const metadata: Metadata = { title: "Shared output · ProxiPixel" };
+export const metadata: Metadata = { title: "Shared output", robots: NOINDEX };
 export const dynamic = "force-dynamic";
 
 interface Resolved {

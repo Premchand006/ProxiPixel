@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { NOINDEX } from "@/lib/seo/metadata";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { listJobs } from "@/server/jobs";
@@ -10,7 +11,7 @@ import {
 import { formatBytes } from "@/lib/app/types";
 import { ShareButton } from "@/components/library/ShareButton";
 
-export const metadata: Metadata = { title: "Library · ProxiPixel" };
+export const metadata: Metadata = { title: "Library", robots: NOINDEX };
 export const dynamic = "force-dynamic";
 
 function when(d: Date | string): string {
