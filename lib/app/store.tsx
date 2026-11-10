@@ -26,7 +26,7 @@ import {
   type UpscaleUIOptions,
   type WatermarkUIOptions,
 } from "./types";
-import type { VideoOptions } from "@/lib/engine/types";
+import type { ImageFormat, VideoOptions } from "@/lib/engine/types";
 import { isJpeg, isPdf, makeThumb, pngSize } from "./files";
 import { videoMeta } from "./video-meta";
 import { runJob } from "./process";
@@ -115,10 +115,27 @@ function toJobInput(
   };
 }
 
-export function StudioProvider({ children }: { children: ReactNode }) {
+export function StudioProvider({
+  children,
+  initialMode = "convert",
+  initialConvertFormat,
+}: {
+  children: ReactNode;
+  /** Tool selected on first render (each landing page opens its own tool). */
+  initialMode?: Mode;
+  /** Convert output preselected by a format page such as /convert/heic-to-jpg. */
+  initialConvertFormat?: ImageFormat;
+}) {
   const { toast } = useToast();
-  const [mode, setModeState] = useState<Mode>("convert");
-  const [options, setOptions] = useState<Options>(DEFAULT_OPTIONS);
+  const [mode, setModeState] = useState<Mode>(initialMode);
+  const [options, setOptions] = useState<Options>(() =>
+    initialConvertFormat
+      ? {
+          ...DEFAULT_OPTIONS,
+          convert: { ...DEFAULT_OPTIONS.convert, fmt: initialConvertFormat },
+        }
+      : DEFAULT_OPTIONS,
+  );
   const [items, setItems] = useState<QueueItem[]>([]);
   const [running, setRunning] = useState(false);
   const [avifOK, setAvifOK] = useState<boolean | null>(null);
@@ -140,14 +157,11 @@ export function StudioProvider({ children }: { children: ReactNode }) {
     };
   }, []);
 
-  const updateItem = useCallback(
-    (id: number, patch: Partial<QueueItem>) => {
-      setItems((prev) =>
-        prev.map((it) => (it.id === id ? { ...it, ...patch } : it)),
-      );
-    },
-    [],
-  );
+  const updateItem = useCallback((id: number, patch: Partial<QueueItem>) => {
+    setItems((prev) =>
+      prev.map((it) => (it.id === id ? { ...it, ...patch } : it)),
+    );
+  }, []);
 
   // ---- options ----
   const setConvert = useCallback((patch: Partial<ConvertOptions>) => {
@@ -197,147 +211,152 @@ export function StudioProvider({ children }: { children: ReactNode }) {
   }, []);
 
   // ---- adding files ----
-  const addFiles = useCallback((list: FileList | File[]) => {
-    const files = [...list].filter(
-      (f) =>
-        f.type.startsWith("image/") ||
-        f.type.startsWith("video/") ||
-        VIDEO_EXT.test(f.name) ||
-        /\.(heic|heif|tif|tiff|pdf)$/i.test(f.name),
-    );
+  const addFiles = useCallback(
+    (list: FileList | File[]) => {
+      const files = [...list].filter(
+        (f) =>
+          f.type.startsWith("image/") ||
+          f.type.startsWith("video/") ||
+          VIDEO_EXT.test(f.name) ||
+          /\.(heic|heif|tif|tiff|pdf)$/i.test(f.name),
+      );
 
-    for (const file of files) {
-      const isVideo =
-        file.type.startsWith("video/") || VIDEO_EXT.test(file.name);
+      for (const file of files) {
+        const isVideo =
+          file.type.startsWith("video/") || VIDEO_EXT.test(file.name);
 
-      if (isVideo) {
+        if (isVideo) {
+          const id = nextId();
+          const it: QueueItem = {
+            id,
+            name: file.name,
+            kind: "video",
+            file,
+            w: 0,
+            h: 0,
+            duration: 0,
+            origSize: file.size,
+            origType: (file.name.split(".").pop() || "VID").toUpperCase(),
+            exif: null,
+            status: "reading…",
+            statusKind: "work",
+          };
+          setItems((prev) => [...prev, it]);
+          videoMeta(file)
+            .then((m) =>
+              updateItem(id, {
+                w: m.w,
+                h: m.h,
+                duration: m.duration,
+                thumb: m.poster,
+                status: "",
+                statusKind: "",
+              }),
+            )
+            .catch((err: unknown) =>
+              updateItem(id, {
+                status: (err as Error).message || "Could not read video",
+                statusKind: "err",
+              }),
+            );
+          continue;
+        }
+
+        if (isPdf(file)) {
+          const phId = nextId();
+          const placeholder: QueueItem = {
+            id: phId,
+            name: file.name,
+            kind: "image",
+            w: 0,
+            h: 0,
+            origSize: file.size,
+            origType: "PDF",
+            exif: null,
+            status: "rendering pages…",
+            statusKind: "work",
+          };
+          setItems((prev) => [...prev, placeholder]);
+          void (async () => {
+            try {
+              const pages = await renderPdfPages(file);
+              const base = file.name.replace(/\.[^.]+$/, "");
+              const pageItems: QueueItem[] = [];
+              for (const pg of pages) {
+                pageItems.push({
+                  id: nextId(),
+                  name: `${base}_p${pg.page}`,
+                  kind: "image",
+                  canvas: pg.canvas,
+                  w: pg.canvas.width,
+                  h: pg.canvas.height,
+                  origSize: await pngSize(pg.canvas),
+                  origType: "PDF",
+                  exif: null,
+                  thumb: makeThumb(pg.canvas),
+                  status: "",
+                  statusKind: "",
+                });
+              }
+              setItems((prev) =>
+                prev.filter((x) => x.id !== phId).concat(pageItems),
+              );
+            } catch (err: unknown) {
+              updateItem(phId, {
+                status: (err as Error).message || "Could not read PDF",
+                statusKind: "err",
+              });
+            }
+          })();
+          continue;
+        }
+
+        // still image
         const id = nextId();
         const it: QueueItem = {
           id,
-          name: file.name,
-          kind: "video",
-          file,
-          w: 0,
-          h: 0,
-          duration: 0,
-          origSize: file.size,
-          origType: (file.name.split(".").pop() || "VID").toUpperCase(),
-          exif: null,
-          status: "reading…",
-          statusKind: "work",
-        };
-        setItems((prev) => [...prev, it]);
-        videoMeta(file)
-          .then((m) =>
-            updateItem(id, {
-              w: m.w,
-              h: m.h,
-              duration: m.duration,
-              thumb: m.poster,
-              status: "",
-              statusKind: "",
-            }),
-          )
-          .catch((err: unknown) =>
-            updateItem(id, {
-              status: (err as Error).message || "Could not read video",
-              statusKind: "err",
-            }),
-          );
-        continue;
-      }
-
-      if (isPdf(file)) {
-        const phId = nextId();
-        const placeholder: QueueItem = {
-          id: phId,
           name: file.name,
           kind: "image",
           w: 0,
           h: 0,
           origSize: file.size,
-          origType: "PDF",
+          origType: (file.name.split(".").pop() || "").toUpperCase(),
           exif: null,
-          status: "rendering pages…",
+          status: "decoding…",
           statusKind: "work",
         };
-        setItems((prev) => [...prev, placeholder]);
+        setItems((prev) => [...prev, it]);
         void (async () => {
-          try {
-            const pages = await renderPdfPages(file);
-            const base = file.name.replace(/\.[^.]+$/, "");
-            const pageItems: QueueItem[] = [];
-            for (const pg of pages) {
-              pageItems.push({
-                id: nextId(),
-                name: `${base}_p${pg.page}`,
-                kind: "image",
-                canvas: pg.canvas,
-                w: pg.canvas.width,
-                h: pg.canvas.height,
-                origSize: await pngSize(pg.canvas),
-                origType: "PDF",
-                exif: null,
-                thumb: makeThumb(pg.canvas),
-                status: "",
-                statusKind: "",
+          if (isJpeg(file)) {
+            try {
+              updateItem(id, {
+                exif: detectExifJPEG(await file.arrayBuffer()),
               });
+            } catch {
+              /* exif inspection is best-effort */
             }
-            setItems((prev) =>
-              prev.filter((x) => x.id !== phId).concat(pageItems),
-            );
+          }
+          try {
+            const c = await decodeFile(file);
+            updateItem(id, {
+              canvas: c,
+              w: c.width,
+              h: c.height,
+              thumb: makeThumb(c),
+              status: "",
+              statusKind: "",
+            });
           } catch (err: unknown) {
-            updateItem(phId, {
-              status: (err as Error).message || "Could not read PDF",
+            updateItem(id, {
+              status: (err as Error).message || "Could not read",
               statusKind: "err",
             });
           }
         })();
-        continue;
       }
-
-      // still image
-      const id = nextId();
-      const it: QueueItem = {
-        id,
-        name: file.name,
-        kind: "image",
-        w: 0,
-        h: 0,
-        origSize: file.size,
-        origType: (file.name.split(".").pop() || "").toUpperCase(),
-        exif: null,
-        status: "decoding…",
-        statusKind: "work",
-      };
-      setItems((prev) => [...prev, it]);
-      void (async () => {
-        if (isJpeg(file)) {
-          try {
-            updateItem(id, { exif: detectExifJPEG(await file.arrayBuffer()) });
-          } catch {
-            /* exif inspection is best-effort */
-          }
-        }
-        try {
-          const c = await decodeFile(file);
-          updateItem(id, {
-            canvas: c,
-            w: c.width,
-            h: c.height,
-            thumb: makeThumb(c),
-            status: "",
-            statusKind: "",
-          });
-        } catch (err: unknown) {
-          updateItem(id, {
-            status: (err as Error).message || "Could not read",
-            statusKind: "err",
-          });
-        }
-      })();
-    }
-  }, [updateItem]);
+    },
+    [updateItem],
+  );
 
   // ---- running ----
   const finishItem = useCallback(
@@ -439,14 +458,20 @@ export function StudioProvider({ children }: { children: ReactNode }) {
   const downloadAll = useCallback(async () => {
     const done = items
       .filter((it) => it.result && it.resultName)
-      .map((it) => ({ url: it.result as string, name: it.resultName as string }));
+      .map((it) => ({
+        url: it.result as string,
+        name: it.resultName as string,
+      }));
     await downloadEach(done);
   }, [items]);
 
   const downloadZip = useCallback(async () => {
     const done = items
       .filter((it) => it.resultBlob && it.resultName)
-      .map((it) => ({ name: it.resultName as string, blob: it.resultBlob as Blob }));
+      .map((it) => ({
+        name: it.resultName as string,
+        blob: it.resultBlob as Blob,
+      }));
     if (!done.length) return;
     const blob = await zipResults(done);
     const url = URL.createObjectURL(blob);
@@ -466,7 +491,11 @@ export function StudioProvider({ children }: { children: ReactNode }) {
         });
         if (!prep.ok || !prep.path) {
           const message = prep.error ?? "Save failed";
-          updateItem(item.id, { saving: false, status: message, statusKind: "err" });
+          updateItem(item.id, {
+            saving: false,
+            status: message,
+            statusKind: "err",
+          });
           toast(message, "error");
           return;
         }
@@ -484,7 +513,11 @@ export function StudioProvider({ children }: { children: ReactNode }) {
         );
       } catch (err: unknown) {
         const message = (err as Error).message || "Save failed";
-        updateItem(item.id, { saving: false, status: message, statusKind: "err" });
+        updateItem(item.id, {
+          saving: false,
+          status: message,
+          statusKind: "err",
+        });
         toast(message, "error");
       }
     },
@@ -492,7 +525,10 @@ export function StudioProvider({ children }: { children: ReactNode }) {
   );
 
   // ---- modals ----
-  const openCompare = useCallback((item: QueueItem) => setCompareItem(item), []);
+  const openCompare = useCallback(
+    (item: QueueItem) => setCompareItem(item),
+    [],
+  );
   const closeCompare = useCallback(() => setCompareItem(null), []);
   const openVideo = useCallback((item: QueueItem) => setVideoItem(item), []);
   const closeVideo = useCallback(() => setVideoItem(null), []);

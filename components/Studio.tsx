@@ -11,19 +11,36 @@ import { PdfToolsStudio } from "./PdfToolsStudio";
 import { CompareModal } from "./CompareModal";
 import { VideoModal } from "./VideoModal";
 import Image from "next/image";
+import { useEffect } from "react";
+import { usePathname } from "next/navigation";
+import type { Mode } from "@/lib/app/types";
+import { ToolGuide } from "./seo/ToolGuide";
+import {
+  SITE_NAME,
+  TOOLS,
+  pairBySlug,
+  pairPath,
+  type ConvertPair,
+} from "@/lib/seo/site";
+import { documentTitle } from "@/lib/seo/metadata";
 
-function Header() {
+function Header({ h1, lead }: { h1: string; lead: string }) {
   return (
     <header className="top">
       <div className="brand">
         <div className="wordmark">
-          <Image src="/logo.png" alt="" width={36} height={36} className="wordmarklogo" priority />
+          <Image
+            src="/logo.png"
+            alt=""
+            width={36}
+            height={36}
+            className="wordmarklogo"
+            priority
+          />
           PROXIPIXEL
         </div>
-        <div className="tagline">
-          Convert, upscale, optimize and de-watermark images right in your
-          browser. Files never leave your device.
-        </div>
+        <h1 className="toolh1">{h1}</h1>
+        <p className="tagline">{lead}</p>
       </div>
       <div className="privacy">
         <span className="dot" /> Runs locally · no uploads
@@ -36,9 +53,10 @@ function Notes() {
   return (
     <div className="notes">
       <div className="note">
-        <b>4K upscaling.</b> Defaults to 4K UHD (3840px long edge): gamma-correct
-        Lanczos in linear light, then a thresholded Gaussian sharpen for crisp edges
-        without halos. Enlarges existing detail; doesn’t invent it.
+        <b>4K upscaling.</b> Defaults to 4K UHD (3840px long edge):
+        gamma-correct Lanczos in linear light, then a thresholded Gaussian
+        sharpen for crisp edges without halos. Enlarges existing detail; doesn’t
+        invent it.
       </div>
       <div className="note">
         <b>Watermark removal.</b> Strips Gemini’s bottom-right logo with exact
@@ -51,9 +69,9 @@ function Notes() {
       </div>
       <div className="note">
         <b>Documents.</b> Convert DOCX · ODT · RTF · PDF · MD · HTML · TXT and
-        XLSX · CSV · ODS both ways (PPTX import). PDF is text-only:
-        layout, images and fonts don’t survive the round trip. Everything runs
-        in your browser and nothing is uploaded.
+        XLSX · CSV · ODS both ways (PPTX import). PDF is text-only: layout,
+        images and fonts don’t survive the round trip. Everything runs in your
+        browser and nothing is uploaded.
       </div>
       <div className="note">
         <b>Metadata stripped.</b> Every image export is decoded and re-encoded
@@ -64,11 +82,42 @@ function Notes() {
   );
 }
 
-function StudioLayout() {
+function StudioLayout({ pair }: { pair?: ConvertPair }) {
   const { mode } = useStudio();
+  const tool = TOOLS[mode];
+  // A format page (/convert/heic-to-jpg) only describes the Convert tool.
+  const activePair = mode === "convert" ? pair : undefined;
+
+  // Keep the address bar and tab title on the landing page for the active
+  // tool, so a reload, bookmark or shared link reopens the same tool. Tabs
+  // stay in-page (no navigation) so the queued files survive a switch.
+  const pathname = usePathname();
+  const title = activePair
+    ? `${activePair.title} | ${SITE_NAME}`
+    : documentTitle(tool);
+  useEffect(() => {
+    const target = activePair ? pairPath(activePair) : tool.path;
+    if (window.location.pathname !== target) {
+      window.history.replaceState(null, "", target);
+    }
+  }, [tool, activePair]);
+  // Next re-applies the route's own metadata <title> when replaceState
+  // updates its router, so set ours after that commit (keyed on pathname)
+  // and once more on the next task in case the metadata lands later.
+  useEffect(() => {
+    document.title = title;
+    const t = window.setTimeout(() => {
+      document.title = title;
+    }, 0);
+    return () => window.clearTimeout(t);
+  }, [title, pathname]);
+
   return (
-    <div className="wrap">
-      <Header />
+    <main className="wrap">
+      <Header
+        h1={activePair?.h1 ?? tool.h1}
+        lead={activePair?.lead ?? tool.lead}
+      />
       <Tabs />
       {mode === "documents" ? (
         <DocumentStudio />
@@ -83,20 +132,25 @@ function StudioLayout() {
         </>
       )}
       <Notes />
-      <footer>
-        ProxiPixel · Image, video, document and PDF tools that run in your
-        browser
-      </footer>
+      <ToolGuide tool={tool} pair={activePair} />
       <CompareModal />
       <VideoModal />
-    </div>
+    </main>
   );
 }
 
-export function Studio() {
+export function Studio({
+  initialMode = "convert",
+  pairSlug,
+}: {
+  initialMode?: Mode;
+  /** Slug of a /convert/<pair> page; preselects that output format. */
+  pairSlug?: string;
+}) {
+  const pair = pairSlug ? pairBySlug(pairSlug) : undefined;
   return (
-    <StudioProvider>
-      <StudioLayout />
+    <StudioProvider initialMode={initialMode} initialConvertFormat={pair?.to}>
+      <StudioLayout pair={pair} />
     </StudioProvider>
   );
 }
