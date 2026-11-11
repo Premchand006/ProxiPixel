@@ -6,6 +6,7 @@ import {
   absoluteUrl,
   pairBySlug,
   pairPath,
+  siteUrl,
   toolBySlug,
 } from "@/lib/seo/site";
 import { documentTitle, pairMetadata, toolMetadata } from "@/lib/seo/metadata";
@@ -185,5 +186,31 @@ describe("crawler files", () => {
     const body = await res.text();
     expect(body.startsWith("# ProxiPixel\n")).toBe(true);
     for (const p of pages) expect(body).toContain(`(${absoluteUrl(p.path)})`);
+  });
+});
+
+describe("siteUrl", () => {
+  it("prefers the explicit NEXT_PUBLIC_SITE_URL and strips trailing slashes", () => {
+    expect(
+      siteUrl({
+        NEXT_PUBLIC_SITE_URL: "https://a.example/",
+        URL: "https://b.example",
+      }),
+    ).toBe("https://a.example");
+  });
+
+  it("falls back to Netlify's URL, then Vercel's production host", () => {
+    expect(siteUrl({ URL: "https://site.netlify.app" })).toBe(
+      "https://site.netlify.app",
+    );
+    expect(siteUrl({ VERCEL_PROJECT_PRODUCTION_URL: "app.vercel.app" })).toBe(
+      "https://app.vercel.app",
+    );
+  });
+
+  it("uses localhost when nothing is configured", () => {
+    expect(siteUrl({ NEXT_PUBLIC_SITE_URL: "  " })).toBe(
+      "http://localhost:3000",
+    );
   });
 });

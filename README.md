@@ -256,7 +256,7 @@ pnpm dev                     # → http://localhost:3000
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | for accounts | Public anon key |
 | `SUPABASE_SERVICE_ROLE_KEY` | for accounts | Server-only key. Never expose it to the client. |
 | `DATABASE_URL` / `DIRECT_URL` | for accounts | Pooled runtime connection / direct connection for migrations |
-| `NEXT_PUBLIC_SITE_URL` | yes | Public base URL, used for auth redirects, canonical URLs, the sitemap and social cards |
+| `NEXT_PUBLIC_SITE_URL` | yes | Public base URL, used for auth redirects, canonical URLs, the sitemap and social cards. For SEO URLs it falls back to Netlify's `URL` or Vercel's `VERCEL_PROJECT_PRODUCTION_URL` when unset |
 | `NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION` / `NEXT_PUBLIC_BING_SITE_VERIFICATION` | no | Search Console and Bing Webmaster Tools verification tokens |
 | `UPSTASH_REDIS_REST_URL` / `_TOKEN` | no | Distributed rate limiting. Falls back to an in-memory limiter. |
 | `NEXT_PUBLIC_SENTRY_DSN` | no | Error tracking. Add `SENTRY_ORG`, `SENTRY_PROJECT` and `SENTRY_AUTH_TOKEN` for source maps. |

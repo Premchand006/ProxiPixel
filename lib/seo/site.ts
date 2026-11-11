@@ -23,12 +23,25 @@ export const REPO_URL = "https://github.com/Premchand006/ProxiPixel";
 export const THEME_COLOR = { light: "#f5f6fa", dark: "#0f1117" } as const;
 
 /**
- * Absolute origin of the deployment, without a trailing slash. Falls back to
- * localhost so builds without the env var still produce valid absolute URLs.
+ * Absolute origin of the deployment, without a trailing slash. Canonical URLs,
+ * the sitemap, robots.txt, JSON-LD and social cards are all built from it, so
+ * a wrong value silently points search engines elsewhere. In order:
+ *
+ * 1. NEXT_PUBLIC_SITE_URL, when set explicitly
+ * 2. Netlify's URL (the site's primary URL, also on deploy previews, so
+ *    previews canonicalize to production)
+ * 3. Vercel's VERCEL_PROJECT_PRODUCTION_URL (a bare host)
+ * 4. localhost, for local builds
  */
-export function siteUrl(): string {
+export function siteUrl(
+  env: Record<string, string | undefined> = process.env,
+): string {
+  const vercel = env.VERCEL_PROJECT_PRODUCTION_URL?.trim();
   const raw =
-    process.env.NEXT_PUBLIC_SITE_URL?.trim() || "http://localhost:3000";
+    env.NEXT_PUBLIC_SITE_URL?.trim() ||
+    env.URL?.trim() ||
+    (vercel ? `https://${vercel.replace(/^https?:\/\//, "")}` : "") ||
+    "http://localhost:3000";
   return raw.replace(/\/+$/, "");
 }
 
